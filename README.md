@@ -72,6 +72,10 @@ const handleLogout = async () => {
 };
 ```
 
+## Apps Using This Library
+
+- [Night Vision - LiDAR Camera](https://apps.apple.com/app/id1668629667)
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.

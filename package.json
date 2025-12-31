@@ -1,6 +1,6 @@
 {
   "name": "react-native-tinykit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "react native tiny kit for ios",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

@@ -1,5 +1,6 @@
 #import <TinykitSpec/TinykitSpec.h>
+#import <React/RCTEventEmitter.h>
 
-@interface Tinykit : NSObject <NativeTinykitSpec>
+@interface Tinykit : RCTEventEmitter <NativeTinykitSpec>
 
 @end

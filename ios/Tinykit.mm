@@ -10,40 +10,33 @@
     });
 }
 
-- (void)getBatteryLevel:(RCTPromiseResolveBlock)resolve
-                 reject:(RCTPromiseRejectBlock)reject {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIDevice *device = [UIDevice currentDevice];
-        
-        // Check if battery monitoring is already enabled before enabling it
-        BOOL wasMonitoringEnabled = device.batteryMonitoringEnabled;
-        if (!wasMonitoringEnabled) {
-            device.batteryMonitoringEnabled = YES;
-        }
-        
-        float batteryLevel = device.batteryLevel;
-        
-        // Restore previous monitoring state
-        if (!wasMonitoringEnabled) {
-            device.batteryMonitoringEnabled = NO;
-        }
-        
-        if (batteryLevel < 0.0) {
-            // Battery level is unknown
-            reject(@"BATTERY_UNAVAILABLE", @"Battery level is unavailable", nil);
-        } else {
-            // Convert to percentage (0-100)
-            NSNumber *batteryPercentage = @(batteryLevel * 100.0);
-            resolve(batteryPercentage);
-        }
-    });
+- (NSNumber *)getBatteryLevel {
+    UIDevice *device = [UIDevice currentDevice];
+    
+    // Check if battery monitoring is already enabled before enabling it
+    BOOL wasMonitoringEnabled = device.batteryMonitoringEnabled;
+    if (!wasMonitoringEnabled) {
+        device.batteryMonitoringEnabled = YES;
+    }
+    
+    float batteryLevel = device.batteryLevel;
+    
+    // Restore previous monitoring state
+    if (!wasMonitoringEnabled) {
+        device.batteryMonitoringEnabled = NO;
+    }
+    
+    if (batteryLevel < 0.0) {
+        // Battery level is unknown, return -1
+        return @(-1);
+    }
+    
+    // Convert to percentage (0-100)
+    return @(batteryLevel * 100.0);
 }
 
-- (void)isLowPowerModeEnabled:(RCTPromiseResolveBlock)resolve
-                       reject:(__unused RCTPromiseRejectBlock)reject {
-    // NSProcessInfo.isLowPowerModeEnabled is thread-safe, no need for main queue
-    BOOL isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
-    resolve(@(isLowPowerModeEnabled));
+- (BOOL)isLowPowerModeEnabled {
+    return [[NSProcessInfo processInfo] isLowPowerModeEnabled];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

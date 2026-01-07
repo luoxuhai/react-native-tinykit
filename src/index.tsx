@@ -9,17 +9,16 @@ export function restart(): void {
 
 /**
  * Gets the current battery level as a percentage (0-100).
- * @returns A promise that resolves to the battery level percentage.
- * @throws {Error} If battery level is unavailable.
+ * @returns The battery level percentage, or -1 if unavailable.
  */
-export function getBatteryLevel(): Promise<number> {
+export function getBatteryLevel(): number {
   return Tinykit.getBatteryLevel();
 }
 
 /**
  * Checks if Low Power Mode is currently enabled.
- * @returns A promise that resolves to true if Low Power Mode is enabled, false otherwise.
+ * @returns true if Low Power Mode is enabled, false otherwise.
  */
-export function isLowPowerModeEnabled(): Promise<boolean> {
+export function isLowPowerModeEnabled(): boolean {
   return Tinykit.isLowPowerModeEnabled();
 }

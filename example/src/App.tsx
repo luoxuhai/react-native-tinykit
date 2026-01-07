@@ -10,12 +10,12 @@ export default function App() {
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const [lowPowerMode, setLowPowerMode] = useState<boolean | null>(null);
 
-  const fetchBatteryInfo = async () => {
+  const fetchBatteryInfo = () => {
     try {
-      const level = await getBatteryLevel();
+      const level = getBatteryLevel();
       setBatteryLevel(level);
 
-      const isLowPower = await isLowPowerModeEnabled();
+      const isLowPower = isLowPowerModeEnabled();
       setLowPowerMode(isLowPower);
     } catch (error) {
       Alert.alert('Error', `Failed to get battery info: ${error}`);

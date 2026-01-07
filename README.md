@@ -43,7 +43,7 @@ Get the current battery level as a percentage (0-100):
 ```tsx
 import { getBatteryLevel } from 'react-native-tinykit';
 
-const level = await getBatteryLevel();
+const level = getBatteryLevel();
 console.log(`Battery level: ${level}%`);
 ```
 
@@ -54,7 +54,7 @@ Check if Low Power Mode is currently enabled:
 ```tsx
 import { isLowPowerModeEnabled } from 'react-native-tinykit';
 
-const isEnabled = await isLowPowerModeEnabled();
+const isEnabled = isLowPowerModeEnabled();
 console.log(`Low Power Mode: ${isEnabled ? 'Enabled' : 'Disabled'}`);
 ```
 
@@ -82,25 +82,21 @@ restart();
 Gets the current battery level as a percentage.
 
 ```tsx
-getBatteryLevel(): Promise<number>
+getBatteryLevel(): number
 ```
 
-**Returns:** A promise that resolves to the battery level percentage (0-100).
-
-**Throws:** Error if battery level is unavailable.
+**Returns:** The battery level percentage (0-100), or -1 if unavailable.
 
 **Example:**
 
 ```tsx
 import { getBatteryLevel } from 'react-native-tinykit';
 
-try {
-  const level = await getBatteryLevel();
-  if (level < 20) {
-    console.log('Battery is low!');
-  }
-} catch (error) {
-  console.error('Failed to get battery level:', error);
+const level = getBatteryLevel();
+if (level < 0) {
+  console.log('Battery level unavailable');
+} else if (level < 20) {
+  console.log('Battery is low!');
 }
 ```
 
@@ -109,17 +105,17 @@ try {
 Checks if Low Power Mode is currently enabled.
 
 ```tsx
-isLowPowerModeEnabled(): Promise<boolean>
+isLowPowerModeEnabled(): boolean
 ```
 
-**Returns:** A promise that resolves to `true` if Low Power Mode is enabled, `false` otherwise.
+**Returns:** `true` if Low Power Mode is enabled, `false` otherwise.
 
 **Example:**
 
 ```tsx
 import { isLowPowerModeEnabled } from 'react-native-tinykit';
 
-const isLowPower = await isLowPowerModeEnabled();
+const isLowPower = isLowPowerModeEnabled();
 if (isLowPower) {
   // Reduce app functionality to save battery
   console.log('Low Power Mode is enabled');

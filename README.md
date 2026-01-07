@@ -7,6 +7,8 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 
 ## Features
 
+- 🔋 **Battery Level** - Get the current battery level as a percentage
+- ⚡ **Low Power Mode** - Detect if Low Power Mode is enabled
 - 🔄 **App Restart** - Programmatically restart your React Native application
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
@@ -34,6 +36,28 @@ cd ios && pod install
 
 ## Usage
 
+### Get Battery Level
+
+Get the current battery level as a percentage (0-100):
+
+```tsx
+import { getBatteryLevel } from 'react-native-tinykit';
+
+const level = await getBatteryLevel();
+console.log(`Battery level: ${level}%`);
+```
+
+### Check Low Power Mode
+
+Check if Low Power Mode is currently enabled:
+
+```tsx
+import { isLowPowerModeEnabled } from 'react-native-tinykit';
+
+const isEnabled = await isLowPowerModeEnabled();
+console.log(`Low Power Mode: ${isEnabled ? 'Enabled' : 'Disabled'}`);
+```
+
 ### Restart Application
 
 Restart the React Native application programmatically:
@@ -52,6 +76,55 @@ restart();
 - Apply configuration changes that require a restart
 
 ## API Reference
+
+### `getBatteryLevel()`
+
+Gets the current battery level as a percentage.
+
+```tsx
+getBatteryLevel(): Promise<number>
+```
+
+**Returns:** A promise that resolves to the battery level percentage (0-100).
+
+**Throws:** Error if battery level is unavailable.
+
+**Example:**
+
+```tsx
+import { getBatteryLevel } from 'react-native-tinykit';
+
+try {
+  const level = await getBatteryLevel();
+  if (level < 20) {
+    console.log('Battery is low!');
+  }
+} catch (error) {
+  console.error('Failed to get battery level:', error);
+}
+```
+
+### `isLowPowerModeEnabled()`
+
+Checks if Low Power Mode is currently enabled.
+
+```tsx
+isLowPowerModeEnabled(): Promise<boolean>
+```
+
+**Returns:** A promise that resolves to `true` if Low Power Mode is enabled, `false` otherwise.
+
+**Example:**
+
+```tsx
+import { isLowPowerModeEnabled } from 'react-native-tinykit';
+
+const isLowPower = await isLowPowerModeEnabled();
+if (isLowPower) {
+  // Reduce app functionality to save battery
+  console.log('Low Power Mode is enabled');
+}
+```
 
 ### `restart()`
 

@@ -3,6 +3,13 @@ import Tinykit, { type ThermalState } from './NativeTinykit';
 
 export type { ThermalState } from './NativeTinykit';
 
+/**
+ * Event payload for thermal state change events.
+ */
+interface ThermalStateChangeEvent {
+  thermalState: ThermalState;
+}
+
 const TinykitEventEmitter = new NativeEventEmitter(Tinykit);
 
 /**
@@ -38,7 +45,8 @@ export function addThermalStateListener(listener: ThermalStateListener): {
   const subscription = TinykitEventEmitter.addListener(
     'thermalStateDidChange',
     (event) => {
-      listener((event as { thermalState: ThermalState }).thermalState);
+      const thermalEvent = event as ThermalStateChangeEvent;
+      listener(thermalEvent.thermalState);
     }
   );
   return subscription;

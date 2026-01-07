@@ -44,7 +44,11 @@ export default function App() {
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Battery Level:</Text>
         <Text style={styles.value}>
-          {batteryLevel !== null ? `${batteryLevel.toFixed(0)}%` : 'Loading...'}
+          {batteryLevel !== null
+            ? batteryLevel < 0
+              ? 'Unavailable'
+              : `${batteryLevel.toFixed(0)}%`
+            : 'Loading...'}
         </Text>
       </View>
 

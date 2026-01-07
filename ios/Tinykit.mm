@@ -40,7 +40,7 @@
 }
 
 - (void)isLowPowerModeEnabled:(RCTPromiseResolveBlock)resolve
-                       reject:(RCTPromiseRejectBlock)reject {
+                       reject:(__unused RCTPromiseRejectBlock)reject {
     // NSProcessInfo.isLowPowerModeEnabled is thread-safe, no need for main queue
     BOOL isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
     resolve(@(isLowPowerModeEnabled));

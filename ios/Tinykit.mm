@@ -14,9 +14,19 @@
                  reject:(RCTPromiseRejectBlock)reject {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIDevice *device = [UIDevice currentDevice];
-        device.batteryMonitoringEnabled = YES;
+        
+        // Check if battery monitoring is already enabled before enabling it
+        BOOL wasMonitoringEnabled = device.batteryMonitoringEnabled;
+        if (!wasMonitoringEnabled) {
+            device.batteryMonitoringEnabled = YES;
+        }
         
         float batteryLevel = device.batteryLevel;
+        
+        // Restore previous monitoring state
+        if (!wasMonitoringEnabled) {
+            device.batteryMonitoringEnabled = NO;
+        }
         
         if (batteryLevel < 0.0) {
             // Battery level is unknown
@@ -31,10 +41,9 @@
 
 - (void)isLowPowerModeEnabled:(RCTPromiseResolveBlock)resolve
                        reject:(RCTPromiseRejectBlock)reject {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
-        resolve(@(isLowPowerModeEnabled));
-    });
+    // NSProcessInfo.isLowPowerModeEnabled is thread-safe, no need for main queue
+    BOOL isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
+    resolve(@(isLowPowerModeEnabled));
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

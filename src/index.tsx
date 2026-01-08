@@ -1,16 +1,9 @@
-import { NativeEventEmitter } from 'react-native';
-import Tinykit, { type ThermalState } from './NativeTinykit';
+import Tinykit, {
+  type ThermalState,
+  type ThermalStateChangeEvent,
+} from './NativeTinykit';
 
-export type { ThermalState } from './NativeTinykit';
-
-/**
- * Event payload for thermal state change events.
- */
-interface ThermalStateChangeEvent {
-  thermalState: ThermalState;
-}
-
-const TinykitEventEmitter = new NativeEventEmitter(Tinykit);
+export type { ThermalState, ThermalStateChangeEvent } from './NativeTinykit';
 
 /**
  * Restarts the React Native application.
@@ -42,11 +35,9 @@ export type ThermalStateListener = (state: ThermalState) => void;
 export function addThermalStateListener(listener: ThermalStateListener): {
   remove: () => void;
 } {
-  const subscription = TinykitEventEmitter.addListener(
-    'thermalStateDidChange',
-    (event) => {
-      const thermalEvent = event as ThermalStateChangeEvent;
-      listener(thermalEvent.thermalState);
+  const subscription = Tinykit.onThermalStateDidChange(
+    (event: ThermalStateChangeEvent) => {
+      listener(event.thermalState);
     }
   );
   return subscription;

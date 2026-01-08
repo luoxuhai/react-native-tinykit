@@ -2,9 +2,6 @@
 #import <React/RCTReloadCommand.h>
 
 @implementation Tinykit
-{
-    bool hasListeners;
-}
 
 - (instancetype)init
 {
@@ -23,27 +20,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSArray<NSString *> *)supportedEvents
-{
-    return @[@"thermalStateDidChange"];
-}
-
-- (void)startObserving
-{
-    hasListeners = YES;
-}
-
-- (void)stopObserving
-{
-    hasListeners = NO;
-}
-
 - (void)thermalStateDidChange:(NSNotification *)notification
 {
-    if (hasListeners) {
-        NSString *state = [self thermalStateToString:[[NSProcessInfo processInfo] thermalState]];
-        [self sendEventWithName:@"thermalStateDidChange" body:@{@"thermalState": state}];
-    }
+    NSString *state = [self thermalStateToString:[[NSProcessInfo processInfo] thermalState]];
+    [self emitOnThermalStateDidChange:@{@"thermalState": state}];
 }
 
 - (NSString *)thermalStateToString:(NSProcessInfoThermalState)thermalState

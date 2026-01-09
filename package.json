@@ -1,7 +1,7 @@
 {
   "name": "react-native-tinykit",
   "version": "0.1.1",
-  "description": "react native tiny kit for ios",
+  "description": "A lightweight React Native toolkit for iOS, providing essential native utilities (Zero dependencies)",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {

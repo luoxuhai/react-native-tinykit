@@ -1,4 +1,8 @@
-import { TurboModuleRegistry, type TurboModule, CodegenTypes } from 'react-native';
+import {
+  TurboModuleRegistry,
+  type TurboModule,
+  type CodegenTypes,
+} from 'react-native';
 
 /**
  * Thermal state values that indicate the current thermal condition of the device.

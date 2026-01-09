@@ -3,7 +3,9 @@
 [![npm version](https://img.shields.io/npm/v/react-native-tinykit.svg)](https://www.npmjs.com/package/react-native-tinykit)
 [![license](https://img.shields.io/npm/l/react-native-tinykit.svg)](https://github.com/luoxuhai/react-native-tinykit/blob/master/LICENSE)
 
-A lightweight React Native toolkit for iOS, providing essential native utilities.
+A lightweight React Native toolkit for iOS, providing essential native utilities (Zero dependencies).
+
+<img src="./assets/example.png" width="400" />
 
 ## Features
 
@@ -66,7 +68,7 @@ console.log('Current thermal state:', state);
 // Listen for thermal state changes
 const subscription = addThermalStateListener((state) => {
   console.log('Thermal state changed:', state);
-  
+
   switch (state) {
     case 'nominal':
       // Normal operating conditions
@@ -124,12 +126,12 @@ getThermalState(): ThermalState
 
 **Returns:** `'nominal' | 'fair' | 'serious' | 'critical'`
 
-| State | Description |
-|-------|-------------|
-| `nominal` | The thermal state is within normal limits |
-| `fair` | The thermal state is slightly elevated |
-| `serious` | The thermal state is high |
-| `critical` | The thermal state is critically high |
+| State      | Description                               |
+| ---------- | ----------------------------------------- |
+| `nominal`  | The thermal state is within normal limits |
+| `fair`     | The thermal state is slightly elevated    |
+| `serious`  | The thermal state is high                 |
+| `critical` | The thermal state is critically high      |
 
 **Example:**
 
@@ -151,6 +153,7 @@ addThermalStateListener(listener: (state: ThermalState) => void): { remove: () =
 ```
 
 **Parameters:**
+
 - `listener` - Callback function that receives the new thermal state
 
 **Returns:** A subscription object with a `remove()` method to stop listening
@@ -171,6 +174,9 @@ subscription.remove();
 ## Apps Using This Library
 
 - [Night Vision - LiDAR Camera](https://apps.apple.com/app/id1668629667)
+- [Laser Measure - LiDAR Powered](https://apps.apple.com/app/id6466744678)
+- [PhoneAway - Digital Detox](https://apps.apple.com/app/id6744548607)
+- [Fatigue Alert - Stay Awake](https://apps.apple.com/app/id6479893638)
 
 ## Contributing
 

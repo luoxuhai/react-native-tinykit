@@ -35,7 +35,7 @@ export type ThermalStateListener = (state: ThermalState) => void;
 export function addThermalStateListener(listener: ThermalStateListener): {
   remove: () => void;
 } {
-  const subscription = Tinykit.onThermalStateDidChange(
+  const subscription = Tinykit.onThermalStateChange(
     (event: ThermalStateChangeEvent) => {
       listener(event.thermalState);
     }

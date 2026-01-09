@@ -1,5 +1,4 @@
-import { TurboModuleRegistry, type TurboModule } from 'react-native';
-import type { CodegenTypes } from 'react-native';
+import { TurboModuleRegistry, type TurboModule, CodegenTypes } from 'react-native';
 
 /**
  * Thermal state values that indicate the current thermal condition of the device.
@@ -20,7 +19,7 @@ export type ThermalStateChangeEvent = {
 export interface Spec extends TurboModule {
   restart(): void;
   getThermalState(): ThermalState;
-  readonly onThermalStateDidChange: CodegenTypes.EventEmitter<ThermalStateChangeEvent>;
+  readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalStateChangeEvent>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Tinykit');

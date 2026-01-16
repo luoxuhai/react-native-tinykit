@@ -11,6 +11,7 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 
 - 🔄 **App Restart** - Programmatically restart your React Native application
 - 🌡️ **Thermal State** - Get and monitor the device's thermal state
+- ⭐ **App Review** - Request App Store review from within your app
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
 
@@ -59,14 +60,14 @@ restart();
 Get the current thermal state and monitor for changes:
 
 ```tsx
-import { getThermalState, addThermalStateListener } from 'react-native-tinykit';
+import { getThermalState, onThermalStateChange } from 'react-native-tinykit';
 
 // Get current thermal state
 const state = getThermalState();
 console.log('Current thermal state:', state);
 
 // Listen for thermal state changes
-const subscription = addThermalStateListener((state) => {
+const subscription = onThermalStateChange((state) => {
   console.log('Thermal state changed:', state);
 
   switch (state) {
@@ -94,6 +95,24 @@ subscription.remove();
 - Reduce graphics quality or frame rate when device is overheating
 - Pause background tasks during high thermal states
 - Show warnings to users when thermal state is critical
+
+### App Review
+
+Request an App Store review from your user:
+
+```tsx
+import { requestReview } from 'react-native-tinykit';
+
+// Request review
+await requestReview();
+```
+
+> **Note**: In development mode, the review dialog will always appear. In production (TestFlight/App Store), iOS limits the frequency of these prompts (max 3 times per year per user).
+
+#### Example Use Cases
+
+- Prompt for review after a user completes a significant action
+- Ask for feedback after a certain number of app opens
 
 ## API Reference
 
@@ -144,12 +163,12 @@ if (state === 'critical') {
 }
 ```
 
-### `addThermalStateListener()`
+### `onThermalStateChange()`
 
 Adds a listener for thermal state changes.
 
 ```tsx
-addThermalStateListener(listener: (state: ThermalState) => void): { remove: () => void }
+onThermalStateChange(listener: (state: ThermalState) => void): { remove: () => void }
 ```
 
 **Parameters:**
@@ -161,14 +180,38 @@ addThermalStateListener(listener: (state: ThermalState) => void): { remove: () =
 **Example:**
 
 ```tsx
-import { addThermalStateListener } from 'react-native-tinykit';
+import { onThermalStateChange } from 'react-native-tinykit';
 
-const subscription = addThermalStateListener((state) => {
+const subscription = onThermalStateChange((state) => {
   console.log('Thermal state changed to:', state);
 });
 
 // Later, when you want to stop listening:
 subscription.remove();
+```
+
+### `requestReview()`
+
+Requests a review of the app.
+
+```tsx
+requestReview(): Promise<void>
+```
+
+**Returns:** A Promise that resolves when the request is processed.
+
+**Example:**
+
+```tsx
+import { requestReview } from 'react-native-tinykit';
+
+const handleReview = async () => {
+  try {
+    await requestReview();
+  } catch (error) {
+    console.error('Failed to request review:', error);
+  }
+};
 ```
 
 ## Apps Using This Library

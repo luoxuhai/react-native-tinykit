@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -9,18 +9,19 @@ import {
 } from 'react-native';
 import {
   getThermalState,
-  addThermalStateListener,
+  onThermalStateChange,
   restart,
+  requestReview,
   type ThermalState,
 } from 'react-native-tinykit';
 
 export default function App() {
-  const [thermalState, setThermalState] = useState<ThermalState>(
+  const [thermalState, setThermalState] = useState<ThermalState>(() =>
     getThermalState()
   );
 
   useEffect(() => {
-    const subscription = addThermalStateListener((state) => {
+    const subscription = onThermalStateChange((state) => {
       console.log('Thermal state changed:', state);
       setThermalState(state);
     });
@@ -38,6 +39,16 @@ export default function App() {
     const state = getThermalState();
     console.log('Manual get thermal state:', state);
     setThermalState(state);
+  };
+
+  const handleRequestReview = async () => {
+    try {
+      console.log('Requesting review...');
+      await requestReview();
+      console.log('Review request completed');
+    } catch (error) {
+      console.error('Review request failed:', error);
+    }
   };
 
   const thermalColors: Record<ThermalState, string> = {
@@ -90,6 +101,17 @@ export default function App() {
           <Text style={styles.hint}>
             This will trigger a bundle reload of the React Native application.
           </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Review API</Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: '#007AFF' }]}
+            onPress={handleRequestReview}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>Request Review</Text>
+          </TouchableOpacity>
         </View>
       </View>
 

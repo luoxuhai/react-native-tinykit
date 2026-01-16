@@ -1,9 +1,6 @@
-import Tinykit, {
-  type ThermalState,
-  type ThermalStateChangeEvent,
-} from './NativeTinykit';
+import Tinykit, { type ThermalState } from './NativeTinykit';
 
-export type { ThermalState, ThermalStateChangeEvent } from './NativeTinykit';
+export type { ThermalState } from './NativeTinykit';
 
 /**
  * Restarts the React Native application.
@@ -22,6 +19,15 @@ export function getThermalState(): ThermalState {
 }
 
 /**
+ * Requests a review of the app.
+ *
+ * @returns A promise that resolves when the review request is processed.
+ */
+export function requestReview(): Promise<void> {
+  return Tinykit.requestReview();
+}
+
+/**
  * Callback function type for thermal state change events.
  */
 export type ThermalStateListener = (state: ThermalState) => void;
@@ -32,13 +38,8 @@ export type ThermalStateListener = (state: ThermalState) => void;
  * @param listener - Callback function that receives the new thermal state
  * @returns A subscription object with a remove method to stop listening
  */
-export function addThermalStateListener(listener: ThermalStateListener): {
+export function onThermalStateChange(listener: ThermalStateListener): {
   remove: () => void;
 } {
-  const subscription = Tinykit.onThermalStateChange(
-    (event: ThermalStateChangeEvent) => {
-      listener(event.thermalState);
-    }
-  );
-  return subscription;
+  return Tinykit.onThermalStateChange(listener);
 }

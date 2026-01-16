@@ -13,17 +13,11 @@ import {
  */
 export type ThermalState = 'nominal' | 'fair' | 'serious' | 'critical';
 
-/**
- * Event payload for thermal state change events.
- */
-export type ThermalStateChangeEvent = {
-  thermalState: ThermalState;
-};
-
 export interface Spec extends TurboModule {
   restart(): void;
   getThermalState(): ThermalState;
-  readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalStateChangeEvent>;
+  requestReview(): Promise<void>;
+  readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalState>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Tinykit');

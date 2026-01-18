@@ -1,5 +1,10 @@
 #import "Tinykit.h"
+#if __has_include(<react_native_tinykit/react_native_tinykit-Swift.h>)
+#import "react_native_tinykit/react_native_tinykit-Swift.h"
+#else
 #import "react_native_tinykit-Swift.h"
+#endif
+
 
 @implementation Tinykit {
   NativeTinykit *_nativeTinykit;

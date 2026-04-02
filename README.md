@@ -12,6 +12,7 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 - 🔄 **App Restart** - Programmatically restart your React Native application
 - 🌡️ **Thermal State** - Get and monitor the device's thermal state
 - ⭐ **App Review** - Request App Store review from within your app
+- 🔅 **Keep Awake** - Prevent the screen from auto-locking
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
 
@@ -95,6 +96,45 @@ subscription.remove();
 - Reduce graphics quality or frame rate when device is overheating
 - Pause background tasks during high thermal states
 - Show warnings to users when thermal state is critical
+
+### Keep Awake
+
+Prevent the screen from auto-locking:
+
+```tsx
+import {
+  activate,
+  deactivate,
+  useKeepAwake,
+  KeepAwake,
+} from 'react-native-tinykit';
+
+// Imperative API
+activate(); // Keep screen awake
+deactivate(); // Allow screen to auto-lock
+
+// Hook - keeps screen awake while the component is mounted
+function VideoPlayer() {
+  useKeepAwake();
+  return <Video />;
+}
+
+// Component - keeps screen awake while mounted
+function App() {
+  return (
+    <>
+      <KeepAwake />
+      <MyContent />
+    </>
+  );
+}
+```
+
+#### Example Use Cases
+
+- Keep the screen on during video playback
+- Prevent auto-lock during navigation or long-running tasks
+- Keep display active during presentations or reading
 
 ### App Review
 
@@ -188,6 +228,81 @@ const subscription = onThermalStateChange((state) => {
 
 // Later, when you want to stop listening:
 subscription.remove();
+```
+
+### `activate()`
+
+Activates the keep-awake feature, preventing the screen from auto-locking.
+
+```tsx
+activate(): void
+```
+
+**Example:**
+
+```tsx
+import { activate } from 'react-native-tinykit';
+
+activate();
+```
+
+### `deactivate()`
+
+Deactivates the keep-awake feature, allowing the screen to auto-lock.
+
+```tsx
+deactivate(): void
+```
+
+**Example:**
+
+```tsx
+import { deactivate } from 'react-native-tinykit';
+
+deactivate();
+```
+
+### `useKeepAwake()`
+
+A hook that keeps the screen awake while the component is mounted. Automatically deactivates on unmount.
+
+```tsx
+useKeepAwake(): void
+```
+
+**Example:**
+
+```tsx
+import { useKeepAwake } from 'react-native-tinykit';
+
+function VideoPlayer() {
+  useKeepAwake();
+  return <Video />;
+}
+```
+
+### `<KeepAwake />`
+
+A component that keeps the screen awake while mounted. Renders nothing.
+
+```tsx
+<KeepAwake />
+```
+
+**Example:**
+
+```tsx
+import { KeepAwake } from 'react-native-tinykit';
+
+function App() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  return (
+    <>
+      {isPlaying && <KeepAwake />}
+      <VideoPlayer onPlay={() => setIsPlaying(true)} />
+    </>
+  );
+}
 ```
 
 ### `requestReview()`

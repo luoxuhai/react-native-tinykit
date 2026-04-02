@@ -17,6 +17,8 @@ export interface Spec extends TurboModule {
   restart(): void;
   getThermalState(): ThermalState;
   requestReview(): Promise<void>;
+  activateKeepAwake(): void;
+  deactivateKeepAwake(): void;
   readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalState>;
 }
 

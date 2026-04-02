@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Tinykit, { type ThermalState } from './NativeTinykit';
 
 export type { ThermalState } from './NativeTinykit';
@@ -42,4 +43,43 @@ export function onThermalStateChange(listener: ThermalStateListener): {
   remove: () => void;
 } {
   return Tinykit.onThermalStateChange(listener);
+}
+
+/**
+ * Activates the keep-awake feature, preventing the screen from auto-locking.
+ */
+export function activate(): void {
+  Tinykit.activateKeepAwake();
+}
+
+/**
+ * Deactivates the keep-awake feature, allowing the screen to auto-lock.
+ */
+export function deactivate(): void {
+  Tinykit.deactivateKeepAwake();
+}
+
+/**
+ * A hook that keeps the screen awake while the component is mounted.
+ */
+export function useKeepAwake(): void {
+  useEffect(() => {
+    activate();
+    return () => {
+      deactivate();
+    };
+  }, []);
+}
+
+/**
+ * A component that keeps the screen awake while mounted.
+ *
+ * @example
+ * ```tsx
+ * <KeepAwake />
+ * ```
+ */
+export function KeepAwake(): null {
+  useKeepAwake();
+  return null;
 }

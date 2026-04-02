@@ -55,6 +55,18 @@ import StoreKit
     }
   }
 
+  public func activateKeepAwake() {
+    DispatchQueue.main.async {
+      UIApplication.shared.isIdleTimerDisabled = true
+    }
+  }
+
+  public func deactivateKeepAwake() {
+    DispatchQueue.main.async {
+      UIApplication.shared.isIdleTimerDisabled = false
+    }
+  }
+
   @objc private func handleThermalStateChange() {
     let state = getThermalState()
     onThermalStateChange?(state)

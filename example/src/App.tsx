@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Text,
   View,
@@ -12,6 +12,8 @@ import {
   onThermalStateChange,
   restart,
   requestReview,
+  activate,
+  deactivate,
   type ThermalState,
 } from 'react-native-tinykit';
 
@@ -19,6 +21,16 @@ export default function App() {
   const [thermalState, setThermalState] = useState<ThermalState>(() =>
     getThermalState()
   );
+  const [keepAwake, setKeepAwake] = useState(false);
+
+  const handleToggleKeepAwake = useCallback(() => {
+    if (keepAwake) {
+      deactivate();
+    } else {
+      activate();
+    }
+    setKeepAwake((prev) => !prev);
+  }, [keepAwake]);
 
   useEffect(() => {
     const subscription = onThermalStateChange((state) => {
@@ -100,6 +112,33 @@ export default function App() {
           </TouchableOpacity>
           <Text style={styles.hint}>
             This will trigger a bundle reload of the React Native application.
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Keep Awake API</Text>
+          <View
+            style={[
+              styles.stateBadge,
+              { backgroundColor: keepAwake ? '#4CAF50' : '#9E9E9E' },
+            ]}
+          >
+            <Text style={styles.stateText}>{keepAwake ? 'ON' : 'OFF'}</Text>
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: keepAwake ? '#FF3B30' : '#34C759' },
+            ]}
+            onPress={handleToggleKeepAwake}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>
+              {keepAwake ? 'Disable Keep Awake' : 'Enable Keep Awake'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.hint}>
+            Prevents the screen from auto-locking when enabled.
           </Text>
         </View>
 

@@ -35,6 +35,14 @@
   [_nativeTinykit requestReviewWithResolve:resolve rejecter:reject];
 }
 
+- (void)activateKeepAwake {
+  [_nativeTinykit activateKeepAwake];
+}
+
+- (void)deactivateKeepAwake {
+  [_nativeTinykit deactivateKeepAwake];
+}
+
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
 (const facebook::react::ObjCTurboModule::InitParams &)params
 {

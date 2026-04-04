@@ -13,6 +13,15 @@ import {
  */
 export type ThermalState = 'nominal' | 'fair' | 'serious' | 'critical';
 
+export type ImpactFeedbackStyle =
+  | 'light'
+  | 'medium'
+  | 'heavy'
+  | 'soft'
+  | 'rigid';
+
+export type NotificationFeedbackType = 'success' | 'warning' | 'error';
+
 export interface Spec extends TurboModule {
   restart(): void;
   getThermalState(): ThermalState;
@@ -20,6 +29,9 @@ export interface Spec extends TurboModule {
   activateKeepAwake(): void;
   deactivateKeepAwake(): void;
   readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalState>;
+  impact(style: string): void;
+  selection(): void;
+  notification(type: string): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Tinykit');

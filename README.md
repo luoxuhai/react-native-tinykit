@@ -13,6 +13,7 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 - 🌡️ **Thermal State** - Get and monitor the device's thermal state
 - ⭐ **App Review** - Request App Store review from within your app
 - 🔅 **Keep Awake** - Prevent the screen from auto-locking
+- 📳 **Haptic Feedback** - Trigger impact, selection, and notification haptics
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
 
@@ -135,6 +136,35 @@ function App() {
 - Keep the screen on during video playback
 - Prevent auto-lock during navigation or long-running tasks
 - Keep display active during presentations or reading
+
+### Haptic Feedback
+
+Trigger haptic feedback with three types of generators:
+
+```tsx
+import { impact, selection, notification } from 'react-native-tinykit';
+
+// Impact feedback - physical "tap" sensation
+impact('light');
+impact('medium');
+impact('heavy');
+impact('soft');
+impact('rigid');
+
+// Selection feedback - subtle "tick" for selection changes
+selection();
+
+// Notification feedback - communicates success, warning, or error
+notification('success');
+notification('warning');
+notification('error');
+```
+
+#### Example Use Cases
+
+- Provide tactile feedback on button press or toggle
+- Indicate state changes with selection haptics
+- Communicate action results (success/failure) with notification haptics
 
 ### App Review
 
@@ -303,6 +333,87 @@ function App() {
     </>
   );
 }
+```
+
+### `impact()`
+
+Triggers an impact haptic feedback.
+
+```tsx
+impact(style: ImpactFeedbackStyle): void
+```
+
+**Parameters:**
+
+- `style` - The style of the impact feedback
+
+| Style    | Description                    |
+| -------- | ------------------------------ |
+| `light`  | A light, subtle impact         |
+| `medium` | A medium impact (default feel) |
+| `heavy`  | A heavy, strong impact         |
+| `soft`   | A soft, gentle impact          |
+| `rigid`  | A rigid, firm impact           |
+
+**Example:**
+
+```tsx
+import { impact } from 'react-native-tinykit';
+
+const handlePress = () => {
+  impact('medium');
+};
+```
+
+### `selection()`
+
+Triggers a selection haptic feedback. Use this for selection changes like picking a value.
+
+```tsx
+selection(): void
+```
+
+**Example:**
+
+```tsx
+import { selection } from 'react-native-tinykit';
+
+const handleSelectionChange = () => {
+  selection();
+};
+```
+
+### `notification()`
+
+Triggers a notification haptic feedback to communicate successes, failures, or warnings.
+
+```tsx
+notification(type: NotificationFeedbackType): void
+```
+
+**Parameters:**
+
+- `type` - The type of notification feedback
+
+| Type      | Description                             |
+| --------- | --------------------------------------- |
+| `success` | Indicates a task completed successfully |
+| `warning` | Indicates a warning or caution          |
+| `error`   | Indicates an error or failure           |
+
+**Example:**
+
+```tsx
+import { notification } from 'react-native-tinykit';
+
+const handleSubmit = async () => {
+  try {
+    await submitForm();
+    notification('success');
+  } catch {
+    notification('error');
+  }
+};
 ```
 
 ### `requestReview()`

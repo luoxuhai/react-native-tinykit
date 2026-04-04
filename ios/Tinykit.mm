@@ -43,6 +43,18 @@
   [_nativeTinykit deactivateKeepAwake];
 }
 
+- (void)impact:(NSString *)style {
+  [_nativeTinykit impactWithStyle:style];
+}
+
+- (void)selection {
+  [_nativeTinykit selection];
+}
+
+- (void)notification:(NSString *)type {
+  [_nativeTinykit notificationWithType:type];
+}
+
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
 (const facebook::react::ObjCTurboModule::InitParams &)params
 {

@@ -1,7 +1,15 @@
 import { useEffect } from 'react';
-import Tinykit, { type ThermalState } from './NativeTinykit';
+import Tinykit, {
+  type ThermalState,
+  type ImpactFeedbackStyle,
+  type NotificationFeedbackType,
+} from './NativeTinykit';
 
-export type { ThermalState } from './NativeTinykit';
+export type {
+  ThermalState,
+  ImpactFeedbackStyle,
+  NotificationFeedbackType,
+} from './NativeTinykit';
 
 /**
  * Restarts the React Native application.
@@ -82,4 +90,29 @@ export function useKeepAwake(): void {
 export function KeepAwake(): null {
   useKeepAwake();
   return null;
+}
+
+/**
+ * Triggers an impact haptic feedback.
+ *
+ * @param style - The style of the impact: 'light', 'medium', 'heavy', 'soft', or 'rigid'
+ */
+export function impact(style: ImpactFeedbackStyle): void {
+  Tinykit.impact(style);
+}
+
+/**
+ * Triggers a selection haptic feedback.
+ */
+export function selection(): void {
+  Tinykit.selection();
+}
+
+/**
+ * Triggers a notification haptic feedback.
+ *
+ * @param type - The type of notification: 'success', 'warning', or 'error'
+ */
+export function notification(type: NotificationFeedbackType): void {
+  Tinykit.notification(type);
 }

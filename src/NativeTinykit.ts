@@ -22,12 +22,55 @@ export type ImpactFeedbackStyle =
 
 export type NotificationFeedbackType = 'success' | 'warning' | 'error';
 
+export type ColorPickerOptions = {
+  /**
+   * Initial selected color. Supports #RGB, #RGBA, #RRGGBB, and #RRGGBBAA.
+   */
+  selectedColor?: string;
+  /**
+   * Whether the picker shows the alpha slider. Defaults to true.
+   */
+  supportsAlpha?: boolean;
+  /**
+   * Whether the picker supports the eyedropper when available on the OS.
+   */
+  supportsEyedropper?: boolean;
+  /**
+   * Maximum exposure applied to colors returned by the picker when available on the OS.
+   */
+  maximumLinearExposure?: CodegenTypes.Double;
+  /**
+   * Optional navigation title shown by the color picker.
+   */
+  title?: string;
+  /**
+   * Shows a Done button in the top-right corner.
+   */
+  showDoneButton?: boolean;
+  /**
+   * Custom text for the top-right Done button.
+   */
+  doneButtonTitle?: string;
+};
+
+export type ColorPickerResult = {
+  /**
+   * Selected color returned as #RRGGBBAA.
+   */
+  color: string;
+  red: CodegenTypes.Double;
+  green: CodegenTypes.Double;
+  blue: CodegenTypes.Double;
+  alpha: CodegenTypes.Double;
+};
+
 export interface Spec extends TurboModule {
   restart(): void;
   getThermalState(): ThermalState;
   requestReview(): Promise<void>;
   activateKeepAwake(): void;
   deactivateKeepAwake(): void;
+  showColorPicker(options: ColorPickerOptions): Promise<ColorPickerResult>;
   readonly onThermalStateChange: CodegenTypes.EventEmitter<ThermalState>;
   impact(style: string): void;
   selection(): void;

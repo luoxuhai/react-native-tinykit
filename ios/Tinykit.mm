@@ -55,6 +55,47 @@
   [_nativeTinykit notificationWithType:type];
 }
 
+- (void)showColorPicker:(JS::NativeTinykit::ColorPickerOptions &)options resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+  NSMutableDictionary *pickerOptions = [NSMutableDictionary dictionary];
+
+  NSString *selectedColor = options.selectedColor();
+  if (selectedColor != nil) {
+    pickerOptions[@"selectedColor"] = selectedColor;
+  }
+
+  auto supportsAlpha = options.supportsAlpha();
+  if (supportsAlpha.has_value()) {
+    pickerOptions[@"supportsAlpha"] = @(*supportsAlpha);
+  }
+
+  auto supportsEyedropper = options.supportsEyedropper();
+  if (supportsEyedropper.has_value()) {
+    pickerOptions[@"supportsEyedropper"] = @(*supportsEyedropper);
+  }
+
+  auto maximumLinearExposure = options.maximumLinearExposure();
+  if (maximumLinearExposure.has_value()) {
+    pickerOptions[@"maximumLinearExposure"] = @(*maximumLinearExposure);
+  }
+
+  NSString *title = options.title();
+  if (title != nil) {
+    pickerOptions[@"title"] = title;
+  }
+
+  auto showDoneButton = options.showDoneButton();
+  if (showDoneButton.has_value()) {
+    pickerOptions[@"showDoneButton"] = @(*showDoneButton);
+  }
+
+  NSString *doneButtonTitle = options.doneButtonTitle();
+  if (doneButtonTitle != nil) {
+    pickerOptions[@"doneButtonTitle"] = doneButtonTitle;
+  }
+
+  [_nativeTinykit showColorPicker:pickerOptions resolve:resolve rejecter:reject];
+}
+
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
 (const facebook::react::ObjCTurboModule::InitParams &)params
 {

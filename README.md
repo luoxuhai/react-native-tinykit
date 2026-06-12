@@ -14,6 +14,7 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 - ⭐ **App Review** - Request App Store review from within your app
 - 🔅 **Keep Awake** - Prevent the screen from auto-locking
 - 📳 **Haptic Feedback** - Trigger impact, selection, and notification haptics
+- 🎨 **Color Picker** - Present the native iOS color picker
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
 
@@ -183,6 +184,25 @@ await requestReview();
 
 - Prompt for review after a user completes a significant action
 - Ask for feedback after a certain number of app opens
+
+### Color Picker
+
+Present the native iOS color picker:
+
+```tsx
+import { showColorPicker } from 'react-native-tinykit';
+
+const result = await showColorPicker({
+  selectedColor: '#007AFF',
+  supportsAlpha: true,
+  supportsEyedropper: true,
+  maximumLinearExposure: 1,
+  title: 'Pick a Color',
+  showDoneButton: true,
+});
+
+console.log(result.color); // #RRGGBBAA
+```
 
 ## API Reference
 
@@ -437,6 +457,38 @@ const handleReview = async () => {
   } catch (error) {
     console.error('Failed to request review:', error);
   }
+};
+```
+
+### `showColorPicker()`
+
+Shows the native iOS `UIColorPickerViewController`.
+
+```tsx
+showColorPicker(options?: ColorPickerOptions): Promise<ColorPickerResult>
+```
+
+**Options:**
+
+| Option                  | Type      | Description                                              |
+| ----------------------- | --------- | -------------------------------------------------------- |
+| `selectedColor`         | `string`  | Initial color. Supports `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA`. |
+| `supportsAlpha`         | `boolean` | Shows the alpha slider. Defaults to `true`.              |
+| `supportsEyedropper`    | `boolean` | Enables eyedropper support when available on the OS.     |
+| `maximumLinearExposure` | `number`  | Maximum linear exposure when available on the OS.        |
+| `title`                 | `string`  | Optional picker title.                                   |
+| `showDoneButton`        | `boolean` | Shows a top-right Done button.                           |
+| `doneButtonTitle`       | `string`  | Custom title for the Done button.                        |
+
+**Returns:** A Promise resolving to:
+
+```tsx
+type ColorPickerResult = {
+  color: string; // #RRGGBBAA
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
 };
 ```
 

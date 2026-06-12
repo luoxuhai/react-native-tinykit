@@ -1,11 +1,15 @@
 import { useEffect } from 'react';
 import Tinykit, {
+  type ColorPickerOptions,
+  type ColorPickerResult,
   type ThermalState,
   type ImpactFeedbackStyle,
   type NotificationFeedbackType,
 } from './NativeTinykit';
 
 export type {
+  ColorPickerOptions,
+  ColorPickerResult,
   ThermalState,
   ImpactFeedbackStyle,
   NotificationFeedbackType,
@@ -34,6 +38,18 @@ export function getThermalState(): ThermalState {
  */
 export function requestReview(): Promise<void> {
   return Tinykit.requestReview();
+}
+
+/**
+ * Shows the native iOS color picker.
+ *
+ * @param options - Color picker configuration
+ * @returns A promise that resolves with the selected color when the picker finishes.
+ */
+export function showColorPicker(
+  options: ColorPickerOptions = {}
+): Promise<ColorPickerResult> {
+  return Tinykit.showColorPicker(options);
 }
 
 /**

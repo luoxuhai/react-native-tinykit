@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import {
   getThermalState,
@@ -14,6 +15,7 @@ import {
   requestReview,
   activate,
   deactivate,
+  showColorPicker,
   type ThermalState,
 } from 'react-native-tinykit';
 
@@ -63,6 +65,23 @@ export default function App() {
     }
   };
 
+  const handleShowColorPicker = async () => {
+    try {
+      const result = await showColorPicker({
+        selectedColor: '#007AFF',
+        supportsAlpha: true,
+        supportsEyedropper: true,
+        maximumLinearExposure: 1,
+        title: 'Pick a Color',
+        showDoneButton: true,
+        doneButtonTitle: 'Apply',
+      });
+      console.log('Selected color:', result);
+    } catch (error) {
+      console.error('Color picker failed:', error);
+    }
+  };
+
   const thermalColors: Record<ThermalState, string> = {
     nominal: '#4CAF50',
     fair: '#FFC107',
@@ -72,91 +91,106 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <Text style={styles.title}>Tinykit Example</Text>
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.label}>Thermal State API</Text>
-          <View
-            style={[
-              styles.stateBadge,
-              { backgroundColor: thermalColors[thermalState] },
-            ]}
-          >
-            <Text style={styles.stateText}>{thermalState.toUpperCase()}</Text>
-          </View>
-          <Text style={styles.description}>
-            The thermal state indicates the current thermal condition of the
-            device.
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 16 }]}
-            onPress={handleGetThermalState}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>Get Thermal State</Text>
-          </TouchableOpacity>
+      <ScrollView>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.header}>
+          <Text style={styles.title}>Tinykit Example</Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Restart API</Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#FF3B30' }]}
-            onPress={handleRestart}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>Restart Application</Text>
-          </TouchableOpacity>
-          <Text style={styles.hint}>
-            This will trigger a bundle reload of the React Native application.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Keep Awake API</Text>
-          <View
-            style={[
-              styles.stateBadge,
-              { backgroundColor: keepAwake ? '#4CAF50' : '#9E9E9E' },
-            ]}
-          >
-            <Text style={styles.stateText}>{keepAwake ? 'ON' : 'OFF'}</Text>
-          </View>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { backgroundColor: keepAwake ? '#FF3B30' : '#34C759' },
-            ]}
-            onPress={handleToggleKeepAwake}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>
-              {keepAwake ? 'Disable Keep Awake' : 'Enable Keep Awake'}
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <Text style={styles.label}>Thermal State API</Text>
+            <View
+              style={[
+                styles.stateBadge,
+                { backgroundColor: thermalColors[thermalState] },
+              ]}
+            >
+              <Text style={styles.stateText}>{thermalState.toUpperCase()}</Text>
+            </View>
+            <Text style={styles.description}>
+              The thermal state indicates the current thermal condition of the
+              device.
             </Text>
-          </TouchableOpacity>
-          <Text style={styles.hint}>
-            Prevents the screen from auto-locking when enabled.
-          </Text>
+            <TouchableOpacity
+              style={[styles.button, styles.thermalButton]}
+              onPress={handleGetThermalState}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Get Thermal State</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Restart API</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.restartButton]}
+              onPress={handleRestart}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Restart Application</Text>
+            </TouchableOpacity>
+            <Text style={styles.hint}>
+              This will trigger a bundle reload of the React Native application.
+            </Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Review API</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.reviewButton]}
+              onPress={handleRequestReview}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Request Review</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Color Picker API</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.colorPickerButton]}
+              onPress={handleShowColorPicker}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Show Color Picker</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Keep Awake API</Text>
+            <View
+              style={[
+                styles.stateBadge,
+                keepAwake ? styles.keepAwakeStateOn : styles.keepAwakeStateOff,
+              ]}
+            >
+              <Text style={styles.stateText}>{keepAwake ? 'ON' : 'OFF'}</Text>
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                keepAwake
+                  ? styles.keepAwakeOffButton
+                  : styles.keepAwakeOnButton,
+              ]}
+              onPress={handleToggleKeepAwake}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>
+                {keepAwake ? 'Disable Keep Awake' : 'Enable Keep Awake'}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.hint}>
+              Prevents the screen from auto-locking when enabled.
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Review API</Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#007AFF' }]}
-            onPress={handleRequestReview}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>Request Review</Text>
-          </TouchableOpacity>
+        <View style={styles.footer}>
+          <Text style={styles.version}>react-native-tinykit v0.1.0</Text>
         </View>
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.version}>react-native-tinykit v0.1.0</Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -232,6 +266,30 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  thermalButton: {
+    marginTop: 16,
+  },
+  restartButton: {
+    backgroundColor: '#FF3B30',
+  },
+  reviewButton: {
+    backgroundColor: '#007AFF',
+  },
+  colorPickerButton: {
+    backgroundColor: '#34C759',
+  },
+  keepAwakeStateOn: {
+    backgroundColor: '#4CAF50',
+  },
+  keepAwakeStateOff: {
+    backgroundColor: '#9E9E9E',
+  },
+  keepAwakeOnButton: {
+    backgroundColor: '#34C759',
+  },
+  keepAwakeOffButton: {
+    backgroundColor: '#FF3B30',
   },
   buttonText: {
     color: '#FFF',

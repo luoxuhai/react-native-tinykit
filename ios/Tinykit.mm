@@ -93,6 +93,54 @@
     pickerOptions[@"doneButtonTitle"] = doneButtonTitle;
   }
 
+  auto detents = options.detents();
+  if (detents.has_value()) {
+    NSMutableArray *detentOptions = [NSMutableArray arrayWithCapacity:detents->size()];
+
+    for (const auto &detent : *detents) {
+      NSMutableDictionary *detentOption = [NSMutableDictionary dictionary];
+
+      NSString *type = detent.type();
+      if (type != nil) {
+        detentOption[@"type"] = type;
+      }
+
+      NSString *identifier = detent.identifier();
+      if (identifier != nil) {
+        detentOption[@"identifier"] = identifier;
+      }
+
+      auto height = detent.height();
+      if (height.has_value()) {
+        detentOption[@"height"] = @(*height);
+      }
+
+      auto fraction = detent.fraction();
+      if (fraction.has_value()) {
+        detentOption[@"fraction"] = @(*fraction);
+      }
+
+      [detentOptions addObject:detentOption];
+    }
+
+    pickerOptions[@"detents"] = detentOptions;
+  }
+
+  NSString *selectedDetentIdentifier = options.selectedDetentIdentifier();
+  if (selectedDetentIdentifier != nil) {
+    pickerOptions[@"selectedDetentIdentifier"] = selectedDetentIdentifier;
+  }
+
+  NSString *largestUndimmedDetentIdentifier = options.largestUndimmedDetentIdentifier();
+  if (largestUndimmedDetentIdentifier != nil) {
+    pickerOptions[@"largestUndimmedDetentIdentifier"] = largestUndimmedDetentIdentifier;
+  }
+
+  auto prefersGrabberVisible = options.prefersGrabberVisible();
+  if (prefersGrabberVisible.has_value()) {
+    pickerOptions[@"prefersGrabberVisible"] = @(*prefersGrabberVisible);
+  }
+
   [_nativeTinykit showColorPicker:pickerOptions resolve:resolve rejecter:reject];
 }
 

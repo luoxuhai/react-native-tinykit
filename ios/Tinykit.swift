@@ -43,16 +43,11 @@ import UIKit
     }.first
 
     if let scene = activeWindowScene as? UIWindowScene {
-      if #available(iOS 16.0, *) {
-        Task {
-          await MainActor.run {
-            AppStore.requestReview(in: scene)
-            resolve(nil)
-          }
+      Task {
+        await MainActor.run {
+          AppStore.requestReview(in: scene)
+          resolve(nil)
         }
-      } else {
-        SKStoreReviewController.requestReview(in: scene)
-        resolve(nil)
       }
     } else {
       SKStoreReviewController.requestReview()
@@ -120,6 +115,11 @@ import UIKit
 
       if let title = options["title"] as? String {
         picker.title = title
+      }
+
+      if let detentError = Self.configureColorPickerSheetPresentation(for: picker, options: options) {
+        reject("E_COLOR_PICKER_INVALID_DETENTS", detentError, nil)
+        return
       }
 
       self.colorPickerResolve = resolve
@@ -256,6 +256,158 @@ import UIKit
     ])
 
     colorPickerDoneButton = button
+  }
+
+  private static func configureColorPickerSheetPresentation(
+    for picker: UIColorPickerViewController,
+    options: NSDictionary
+  ) -> String? {
+    let hasSheetOptions =
+      options["detents"] != nil ||
+      options["selectedDetentIdentifier"] != nil ||
+      options["largestUndimmedDetentIdentifier"] != nil ||
+      options["prefersGrabberVisible"] != nil
+
+    guard hasSheetOptions else {
+      return nil
+    }
+
+    picker.modalPresentationStyle = .pageSheet
+
+    guard let sheet = picker.sheetPresentationController else {
+      return nil
+    }
+
+    if let rawDetents = options["detents"] as? NSArray {
+      guard rawDetents.count > 0 else {
+        return "detents must contain at least one detent."
+      }
+
+      var detents: [UISheetPresentationController.Detent] = []
+      detents.reserveCapacity(rawDetents.count)
+
+      for index in 0..<rawDetents.count {
+        guard let detentOptions = rawDetents[index] as? NSDictionary else {
+          return "Each detent must be an object."
+        }
+
+        let result = Self.colorPickerSheetDetent(from: detentOptions, at: index)
+        if let error = result.error {
+          return error
+        }
+
+        if let detent = result.detent {
+          detents.append(detent)
+        }
+      }
+
+      sheet.detents = detents
+    }
+
+    if let selectedDetentIdentifier = Self.nonEmptyString(options["selectedDetentIdentifier"]) {
+      sheet.selectedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(from: selectedDetentIdentifier)
+    }
+
+    if let largestUndimmedDetentIdentifier = Self.nonEmptyString(options["largestUndimmedDetentIdentifier"]) {
+      sheet.largestUndimmedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(from: largestUndimmedDetentIdentifier)
+    }
+
+    if let prefersGrabberVisible = options["prefersGrabberVisible"] as? Bool {
+      sheet.prefersGrabberVisible = prefersGrabberVisible
+    }
+
+    return nil
+  }
+
+  private static func colorPickerSheetDetent(
+    from options: NSDictionary,
+    at index: Int
+  ) -> (detent: UISheetPresentationController.Detent?, error: String?) {
+    let type = (Self.nonEmptyString(options["type"]) ?? "custom").lowercased()
+
+    switch type {
+    case "medium":
+      return (.medium(), nil)
+    case "large":
+      return (.large(), nil)
+    case "custom":
+      return Self.customColorPickerSheetDetent(from: options, at: index)
+    default:
+      return (nil, "detents[\(index)].type must be 'medium', 'large', or 'custom'.")
+    }
+  }
+
+  private static func customColorPickerSheetDetent(
+    from options: NSDictionary,
+    at index: Int
+  ) -> (detent: UISheetPresentationController.Detent?, error: String?) {
+    let height = (options["height"] as? NSNumber).map { CGFloat($0.doubleValue) }
+    let fraction = (options["fraction"] as? NSNumber).map { CGFloat($0.doubleValue) }
+
+    guard height != nil || fraction != nil else {
+      return (nil, "Custom detents must set height or fraction.")
+    }
+
+    if let height, height <= 0 {
+      return (nil, "Custom detent height must be greater than 0.")
+    }
+
+    if let fraction, fraction <= 0 || fraction > 1 {
+      return (nil, "Custom detent fraction must be greater than 0 and less than or equal to 1.")
+    }
+
+    let identifier = Self.nonEmptyString(options["identifier"])
+      ?? Self.generatedColorPickerDetentIdentifier(height: height, fraction: fraction, index: index)
+
+    let detent = UISheetPresentationController.Detent.custom(
+      identifier: UISheetPresentationController.Detent.Identifier(identifier)
+    ) { context in
+      if let height {
+        return min(height, context.maximumDetentValue)
+      }
+
+      return context.maximumDetentValue * (fraction ?? 1)
+    }
+
+    return (detent, nil)
+  }
+
+  private static func colorPickerSheetDetentIdentifier(
+    from value: String
+  ) -> UISheetPresentationController.Detent.Identifier {
+    switch value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+    case "medium":
+      return .medium
+    case "large":
+      return .large
+    default:
+      return UISheetPresentationController.Detent.Identifier(value)
+    }
+  }
+
+  private static func generatedColorPickerDetentIdentifier(
+    height: CGFloat?,
+    fraction: CGFloat?,
+    index: Int
+  ) -> String {
+    if let height {
+      return "height-\(Int(round(height)))-\(index)"
+    }
+
+    if let fraction {
+      return "fraction-\(Int(round(fraction * 1000)))-\(index)"
+    }
+
+    return "custom-\(index)"
+  }
+
+  private static func nonEmptyString(_ value: Any?) -> String? {
+    guard let string = value as? String else {
+      return nil
+    }
+
+    let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? nil : trimmed
   }
 
   private static func setValueIfSupported(_ value: Any, forKey key: String, on object: NSObject) {

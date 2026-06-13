@@ -21,7 +21,7 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 ## Requirements
 
 - React Native >= 0.76
-- iOS only (for now)
+- iOS >= 16.0
 
 ## Installation
 
@@ -199,6 +199,12 @@ const result = await showColorPicker({
   maximumLinearExposure: 1,
   title: 'Pick a Color',
   showDoneButton: true,
+  detents: [
+    { type: 'custom', identifier: 'compact', height: 420 },
+    { type: 'large' },
+  ],
+  selectedDetentIdentifier: 'compact',
+  prefersGrabberVisible: true,
 });
 
 console.log(result.color); // #RRGGBBAA
@@ -479,6 +485,19 @@ showColorPicker(options?: ColorPickerOptions): Promise<ColorPickerResult>
 | `title`                 | `string`  | Optional picker title.                                   |
 | `showDoneButton`        | `boolean` | Shows a top-right Done button.                           |
 | `doneButtonTitle`       | `string`  | Custom title for the Done button.                        |
+| `detents`               | `ColorPickerDetent[]` | Sheet detents. Supports `medium`/`large` and custom `height`/`fraction` detents. |
+| `selectedDetentIdentifier` | `string` | Initially selected detent. Use `medium`, `large`, or a custom detent identifier. |
+| `largestUndimmedDetentIdentifier` | `string` | Largest detent that keeps the presenting view undimmed. |
+| `prefersGrabberVisible` | `boolean` | Shows the sheet grabber.                                 |
+
+```tsx
+type ColorPickerDetent = {
+  type: 'medium' | 'large' | 'custom';
+  identifier?: string;
+  height?: number; // custom height in points
+  fraction?: number; // custom fraction of maximum sheet height
+};
+```
 
 **Returns:** A Promise resolving to:
 

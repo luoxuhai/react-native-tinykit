@@ -22,6 +22,25 @@ export type ImpactFeedbackStyle =
 
 export type NotificationFeedbackType = 'success' | 'warning' | 'error';
 
+export type ColorPickerDetent = {
+  /**
+   * Detent type. Use 'medium' or 'large' for system detents, or 'custom' with height or fraction.
+   */
+  type: 'medium' | 'large' | 'custom';
+  /**
+   * Optional identifier for a custom detent. Used by selectedDetentIdentifier.
+   */
+  identifier?: string;
+  /**
+   * Fixed custom detent height in points.
+   */
+  height?: CodegenTypes.Double;
+  /**
+   * Custom detent height as a fraction of the maximum sheet height.
+   */
+  fraction?: CodegenTypes.Double;
+};
+
 export type ColorPickerOptions = {
   /**
    * Initial selected color. Supports #RGB, #RGBA, #RRGGBB, and #RRGGBBAA.
@@ -51,6 +70,22 @@ export type ColorPickerOptions = {
    * Custom text for the top-right Done button.
    */
   doneButtonTitle?: string;
+  /**
+   * Sheet detents used when presenting the picker. Supports medium/large and custom height/fraction detents.
+   */
+  detents?: ReadonlyArray<ColorPickerDetent>;
+  /**
+   * Initially selected sheet detent identifier. Use 'medium', 'large', or a custom detent identifier.
+   */
+  selectedDetentIdentifier?: string;
+  /**
+   * Largest detent that keeps the presenting view undimmed. Use 'medium', 'large', or a custom detent identifier.
+   */
+  largestUndimmedDetentIdentifier?: string;
+  /**
+   * Whether the sheet grabber is visible.
+   */
+  prefersGrabberVisible?: boolean;
 };
 
 export type ColorPickerResult = {

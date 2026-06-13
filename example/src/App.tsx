@@ -75,6 +75,12 @@ export default function App() {
         title: 'Pick a Color',
         showDoneButton: true,
         doneButtonTitle: 'Apply',
+        detents: [
+          { type: 'medium', identifier: 'compact', height: 420 },
+          { type: 'large' },
+        ],
+        selectedDetentIdentifier: 'compact',
+        prefersGrabberVisible: true,
       });
       console.log('Selected color:', result);
     } catch (error) {

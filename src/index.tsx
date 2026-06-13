@@ -8,6 +8,7 @@ import Tinykit, {
 } from './NativeTinykit';
 
 export type {
+  ColorPickerDetent,
   ColorPickerOptions,
   ColorPickerResult,
   ThermalState,

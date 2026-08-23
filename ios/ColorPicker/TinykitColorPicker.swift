@@ -1,71 +1,11 @@
-import Foundation
 import React
-import StoreKit
 import UIKit
 
-@objcMembers public class NativeTinykit: NSObject {
-  public var onThermalStateChange: ((String) -> Void)?
+@objcMembers public final class TinykitColorPicker: NSObject {
   private var colorPickerResolve: RCTPromiseResolveBlock?
   private var colorPickerReject: RCTPromiseRejectBlock?
   private weak var currentColorPicker: UIColorPickerViewController?
   private weak var colorPickerDoneButton: UIButton?
-
-  public init(onThermalStateChange: @escaping ((String) -> Void)) {
-    super.init()
-    self.onThermalStateChange = onThermalStateChange
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleThermalStateChange),
-      name: ProcessInfo.thermalStateDidChangeNotification,
-      object: nil
-    )
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
-  }
-
-  public func getThermalState() -> String {
-    return thermalStateToString(ProcessInfo.processInfo.thermalState)
-  }
-
-  public func restart() {
-    DispatchQueue.main.async {
-      RCTTriggerReloadCommandListeners("react-native-tinykit")
-    }
-  }
-
-  public func requestReview(
-    resolve: @escaping RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock
-  ) {
-    let activeWindowScene = UIApplication.shared.connectedScenes.filter { scene in
-      return scene.activationState == .foregroundActive && scene is UIWindowScene
-    }.first
-
-    if let scene = activeWindowScene as? UIWindowScene {
-      Task {
-        await MainActor.run {
-          AppStore.requestReview(in: scene)
-          resolve(nil)
-        }
-      }
-    } else {
-      SKStoreReviewController.requestReview()
-      resolve(nil)
-    }
-  }
-
-  public func activateKeepAwake() {
-    DispatchQueue.main.async {
-      UIApplication.shared.isIdleTimerDisabled = true
-    }
-  }
-
-  public func deactivateKeepAwake() {
-    DispatchQueue.main.async {
-      UIApplication.shared.isIdleTimerDisabled = false
-    }
-  }
 
   public func showColorPicker(
     _ options: NSDictionary,
@@ -74,7 +14,7 @@ import UIKit
   ) {
     DispatchQueue.main.async { [weak self] in
       guard let self else {
-        reject("E_COLOR_PICKER_UNAVAILABLE", "Tinykit is unavailable.", nil)
+        reject("E_COLOR_PICKER_UNAVAILABLE", "TinyKit is unavailable.", nil)
         return
       }
 
@@ -84,7 +24,11 @@ import UIKit
       }
 
       guard let presenter = RCTPresentedViewController() else {
-        reject("E_COLOR_PICKER_NO_PRESENTING_VIEW_CONTROLLER", "Unable to find a view controller to present the color picker.", nil)
+        reject(
+          "E_COLOR_PICKER_NO_PRESENTING_VIEW_CONTROLLER",
+          "Unable to find a view controller to present the color picker.",
+          nil
+        )
         return
       }
 
@@ -93,24 +37,28 @@ import UIKit
 
       if let selectedColor = options["selectedColor"] as? String {
         guard let color = Self.color(fromHexString: selectedColor) else {
-          reject("E_COLOR_PICKER_INVALID_COLOR", "selectedColor must be a valid hex color string.", nil)
+          reject(
+            "E_COLOR_PICKER_INVALID_COLOR",
+            "selectedColor must be a valid hex color string.",
+            nil
+          )
           return
         }
         picker.selectedColor = color
       }
 
-      if let supportsAlpha = options["supportsAlpha"] as? Bool {
-        picker.supportsAlpha = supportsAlpha
-      } else {
-        picker.supportsAlpha = true
-      }
+      picker.supportsAlpha = options["supportsAlpha"] as? Bool ?? true
 
       if let supportsEyedropper = options["supportsEyedropper"] as? Bool {
         Self.setValueIfSupported(supportsEyedropper, forKey: "supportsEyedropper", on: picker)
       }
 
       if let maximumLinearExposure = options["maximumLinearExposure"] as? NSNumber {
-        Self.setValueIfSupported(maximumLinearExposure, forKey: "maximumLinearExposure", on: picker)
+        Self.setValueIfSupported(
+          maximumLinearExposure,
+          forKey: "maximumLinearExposure",
+          on: picker
+        )
       }
 
       if let title = options["title"] as? String {
@@ -126,9 +74,7 @@ import UIKit
       self.colorPickerReject = reject
       self.currentColorPicker = picker
 
-      let showDoneButton = options["showDoneButton"] as? Bool ?? false
-
-      if showDoneButton {
+      if options["showDoneButton"] as? Bool ?? false {
         let doneButtonTitle = options["doneButtonTitle"] as? String ?? "Done"
         self.installColorPickerDoneButton(title: doneButtonTitle, on: picker)
       }
@@ -137,61 +83,6 @@ import UIKit
       presenter.present(picker, animated: true) { [weak self, weak picker] in
         picker?.presentationController?.delegate = self
       }
-    }
-  }
-
-  @objc private func handleThermalStateChange() {
-    let state = getThermalState()
-    onThermalStateChange?(state)
-  }
-
-  public func impact(style: String) {
-    DispatchQueue.main.async {
-      let feedbackStyle: UIImpactFeedbackGenerator.FeedbackStyle
-      switch style {
-      case "light":
-        feedbackStyle = .light
-      case "medium":
-        feedbackStyle = .medium
-      case "heavy":
-        feedbackStyle = .heavy
-      case "soft":
-        feedbackStyle = .soft
-      case "rigid":
-        feedbackStyle = .rigid
-      default:
-        feedbackStyle = .medium
-      }
-      let generator = UIImpactFeedbackGenerator(style: feedbackStyle)
-      generator.prepare()
-      generator.impactOccurred()
-    }
-  }
-
-  public func selection() {
-    DispatchQueue.main.async {
-      let generator = UISelectionFeedbackGenerator()
-      generator.prepare()
-      generator.selectionChanged()
-    }
-  }
-
-  public func notification(type: String) {
-    DispatchQueue.main.async {
-      let feedbackType: UINotificationFeedbackGenerator.FeedbackType
-      switch type {
-      case "success":
-        feedbackType = .success
-      case "warning":
-        feedbackType = .warning
-      case "error":
-        feedbackType = .error
-      default:
-        feedbackType = .success
-      }
-      let generator = UINotificationFeedbackGenerator()
-      generator.prepare()
-      generator.notificationOccurred(feedbackType)
     }
   }
 
@@ -204,16 +95,6 @@ import UIKit
     let color = picker.selectedColor
     picker.dismiss(animated: true) { [weak self] in
       self?.resolveColorPicker(with: color)
-    }
-  }
-
-  private func thermalStateToString(_ state: ProcessInfo.ThermalState) -> String {
-    switch state {
-    case .nominal: return "nominal"
-    case .fair: return "fair"
-    case .serious: return "serious"
-    case .critical: return "critical"
-    @unknown default: return "nominal"
     }
   }
 
@@ -250,8 +131,14 @@ import UIKit
     picker.view.addSubview(button)
 
     NSLayoutConstraint.activate([
-      button.trailingAnchor.constraint(equalTo: picker.view.safeAreaLayoutGuide.trailingAnchor, constant: -12),
-      button.topAnchor.constraint(equalTo: picker.view.safeAreaLayoutGuide.topAnchor, constant: 6),
+      button.trailingAnchor.constraint(
+        equalTo: picker.view.safeAreaLayoutGuide.trailingAnchor,
+        constant: -12
+      ),
+      button.topAnchor.constraint(
+        equalTo: picker.view.safeAreaLayoutGuide.topAnchor,
+        constant: 6
+      ),
       button.heightAnchor.constraint(greaterThanOrEqualToConstant: 36),
     ])
 
@@ -305,11 +192,17 @@ import UIKit
     }
 
     if let selectedDetentIdentifier = Self.nonEmptyString(options["selectedDetentIdentifier"]) {
-      sheet.selectedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(from: selectedDetentIdentifier)
+      sheet.selectedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(
+        from: selectedDetentIdentifier
+      )
     }
 
-    if let largestUndimmedDetentIdentifier = Self.nonEmptyString(options["largestUndimmedDetentIdentifier"]) {
-      sheet.largestUndimmedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(from: largestUndimmedDetentIdentifier)
+    if let largestUndimmedDetentIdentifier = Self.nonEmptyString(
+      options["largestUndimmedDetentIdentifier"]
+    ) {
+      sheet.largestUndimmedDetentIdentifier = Self.colorPickerSheetDetentIdentifier(
+        from: largestUndimmedDetentIdentifier
+      )
     }
 
     if let prefersGrabberVisible = options["prefersGrabberVisible"] as? Bool {
@@ -353,7 +246,10 @@ import UIKit
     }
 
     if let fraction, fraction <= 0 || fraction > 1 {
-      return (nil, "Custom detent fraction must be greater than 0 and less than or equal to 1.")
+      return (
+        nil,
+        "Custom detent fraction must be greater than 0 and less than or equal to 1."
+      )
     }
 
     let identifier = Self.nonEmptyString(options["identifier"])
@@ -488,13 +384,13 @@ import UIKit
   }
 }
 
-extension NativeTinykit: UIColorPickerViewControllerDelegate {
+extension TinykitColorPicker: UIColorPickerViewControllerDelegate {
   public func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
     resolveColorPicker(with: viewController.selectedColor)
   }
 }
 
-extension NativeTinykit: UIAdaptivePresentationControllerDelegate {
+extension TinykitColorPicker: UIAdaptivePresentationControllerDelegate {
   public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
     guard let picker = currentColorPicker else {
       resetColorPickerState()

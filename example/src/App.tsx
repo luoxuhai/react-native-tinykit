@@ -16,6 +16,7 @@ import {
   activate,
   deactivate,
   showColorPicker,
+  openMail,
   type ThermalState,
 } from 'react-native-tinykit';
 
@@ -85,6 +86,20 @@ export default function App() {
       console.log('Selected color:', result);
     } catch (error) {
       console.error('Color picker failed:', error);
+    }
+  };
+
+  const handleOpenMail = async () => {
+    try {
+      const result = await openMail({
+        subject: 'TinyKit feedback',
+        recipients: ['support@example.com'],
+        body: '<p>Hello from the TinyKit example app.</p>',
+        isHTML: true,
+      });
+      console.log('Mail composer result:', result);
+    } catch (error) {
+      console.error('Mail composer failed:', error);
     }
   };
 
@@ -189,6 +204,20 @@ export default function App() {
             </TouchableOpacity>
             <Text style={styles.hint}>
               Prevents the screen from auto-locking when enabled.
+            </Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Mail Composer API</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.mailButton]}
+              onPress={handleOpenMail}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Compose Email</Text>
+            </TouchableOpacity>
+            <Text style={styles.hint}>
+              Requires a Mail account configured on the device.
             </Text>
           </View>
         </View>
@@ -296,6 +325,9 @@ const styles = StyleSheet.create({
   },
   keepAwakeOffButton: {
     backgroundColor: '#FF3B30',
+  },
+  mailButton: {
+    backgroundColor: '#5856D6',
   },
   buttonText: {
     color: '#FFF',

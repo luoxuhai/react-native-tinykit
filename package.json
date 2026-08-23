@@ -10,6 +10,42 @@
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
+    "./restart": {
+      "source": "./src/restart.ts",
+      "types": "./lib/typescript/src/restart.d.ts",
+      "default": "./lib/module/restart.js"
+    },
+    "./thermal-state": {
+      "source": "./src/thermal-state.ts",
+      "types": "./lib/typescript/src/thermal-state.d.ts",
+      "default": "./lib/module/thermal-state.js"
+    },
+    "./review": {
+      "source": "./src/review.ts",
+      "types": "./lib/typescript/src/review.d.ts",
+      "default": "./lib/module/review.js"
+    },
+    "./keep-awake": {
+      "source": "./src/keep-awake.tsx",
+      "types": "./lib/typescript/src/keep-awake.d.ts",
+      "default": "./lib/module/keep-awake.js"
+    },
+    "./color-picker": {
+      "source": "./src/color-picker.ts",
+      "types": "./lib/typescript/src/color-picker.d.ts",
+      "default": "./lib/module/color-picker.js"
+    },
+    "./haptics": {
+      "source": "./src/haptics.ts",
+      "types": "./lib/typescript/src/haptics.d.ts",
+      "default": "./lib/module/haptics.js"
+    },
+    "./mail": {
+      "source": "./src/mail.ts",
+      "types": "./lib/typescript/src/mail.d.ts",
+      "default": "./lib/module/mail.js"
+    },
+    "./scripts/setup.rb": "./scripts/setup.rb",
     "./package.json": "./package.json"
   },
   "files": [
@@ -18,6 +54,7 @@
     "android",
     "ios",
     "cpp",
+    "scripts",
     "*.podspec",
     "react-native.config.js",
     "!ios/build",

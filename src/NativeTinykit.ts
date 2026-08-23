@@ -22,6 +22,41 @@ export type ImpactFeedbackStyle =
 
 export type NotificationFeedbackType = 'success' | 'warning' | 'error';
 
+export type MailAttachment = {
+  /**
+   * Absolute local file path. Use either path or uri.
+   */
+  path?: string;
+  /**
+   * Local file URI. Use either path or uri.
+   */
+  uri?: string;
+  /**
+   * File extension or MIME type used to infer the attachment MIME type.
+   */
+  type?: string;
+  /**
+   * Explicit attachment MIME type. Takes precedence over type.
+   */
+  mimeType?: string;
+  /**
+   * File name displayed in the mail composer.
+   */
+  name?: string;
+};
+
+export type MailOptions = {
+  subject?: string;
+  recipients?: ReadonlyArray<string>;
+  ccRecipients?: ReadonlyArray<string>;
+  bccRecipients?: ReadonlyArray<string>;
+  body?: string;
+  isHTML?: boolean;
+  attachments?: ReadonlyArray<MailAttachment>;
+};
+
+export type MailResult = 'sent' | 'saved' | 'cancelled' | 'opened';
+
 export type ColorPickerDetent = {
   /**
    * Detent type. Use 'medium' or 'large' for system detents, or 'custom' with height or fraction.
@@ -100,8 +135,11 @@ export type ColorPickerResult = {
 };
 
 export interface Spec extends TurboModule {
+  getEnabledFeatures(): ReadonlyArray<string>;
   restart(): void;
   getThermalState(): ThermalState;
+  startThermalStateMonitoring(): void;
+  stopThermalStateMonitoring(): void;
   requestReview(): Promise<void>;
   activateKeepAwake(): void;
   deactivateKeepAwake(): void;
@@ -110,6 +148,8 @@ export interface Spec extends TurboModule {
   impact(style: string): void;
   selection(): void;
   notification(type: string): void;
+  canSendMail(): boolean;
+  openMail(options: MailOptions): Promise<MailResult>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Tinykit');

@@ -15,6 +15,8 @@ A lightweight React Native toolkit for iOS, providing essential native utilities
 - 🔅 **Keep Awake** - Prevent the screen from auto-locking
 - 📳 **Haptic Feedback** - Trigger impact, selection, and notification haptics
 - 🎨 **Color Picker** - Present the native iOS color picker
+- ✉️ **Mail Composer** - Present the native iOS mail composer
+- 🧩 **Optional Native Features** - Compile only the native features your app uses
 - ⚡ **Turbo Module** - Built with the new architecture for optimal performance
 - 📦 **Lightweight** - Minimal footprint with zero dependencies
 
@@ -38,6 +40,62 @@ yarn add react-native-tinykit
 ```sh
 cd ios && pod install
 ```
+
+All native features are enabled by default, so no additional configuration is
+required.
+
+#### Optional native feature selection
+
+To reduce the native code compiled into your app, load the TinyKit setup script
+in your `Podfile` and select the features you use:
+
+```ruby
+def node_require(script)
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve(
+      '#{script}',
+      {paths: [process.argv[1]]},
+    )", __dir__]).strip
+end
+
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-tinykit/scripts/setup.rb')
+
+platform :ios, '16.0'
+prepare_react_native_project!
+
+setup_tinykit([
+  'Haptics',
+  'KeepAwake',
+])
+```
+
+Available features:
+
+- `Restart`
+- `ThermalState`
+- `Review`
+- `KeepAwake`
+- `ColorPicker`
+- `Haptics`
+- `Mail`
+
+Use `setup_tinykit([])` to compile only the TurboModule core. Run `pod install`
+again whenever this list changes. Calling most APIs whose native feature was
+not selected throws an error that names the missing feature. `openMail` instead
+falls back to the system `mailto:` URL.
+
+Feature-specific JavaScript entry points are also available:
+
+```tsx
+import { impact } from 'react-native-tinykit/haptics';
+import { activate } from 'react-native-tinykit/keep-awake';
+import { openMail } from 'react-native-tinykit/mail';
+```
+
+The root `react-native-tinykit` imports remain supported for backwards
+compatibility. JavaScript entry points provide cleaner dependency boundaries;
+`setup_tinykit` controls which native source files are compiled.
 
 ## Usage
 
@@ -208,6 +266,30 @@ const result = await showColorPicker({
 });
 
 console.log(result.color); // #RRGGBBAA
+```
+
+### Mail Composer
+
+Present the built-in iOS mail composer without leaving your app:
+
+```tsx
+import { openMail } from 'react-native-tinykit';
+
+const result = await openMail({
+  subject: 'Feedback',
+  recipients: ['support@example.com'],
+  body: '<p>Hello from TinyKit</p>',
+  isHTML: true,
+  attachments: [
+    {
+      path: reportPath,
+      mimeType: 'application/pdf',
+      name: 'report.pdf',
+    },
+  ],
+});
+
+console.log(result); // sent, saved, cancelled, or opened
 ```
 
 ## API Reference
@@ -476,19 +558,19 @@ showColorPicker(options?: ColorPickerOptions): Promise<ColorPickerResult>
 
 **Options:**
 
-| Option                  | Type      | Description                                              |
-| ----------------------- | --------- | -------------------------------------------------------- |
-| `selectedColor`         | `string`  | Initial color. Supports `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA`. |
-| `supportsAlpha`         | `boolean` | Shows the alpha slider. Defaults to `true`.              |
-| `supportsEyedropper`    | `boolean` | Enables eyedropper support when available on the OS.     |
-| `maximumLinearExposure` | `number`  | Maximum linear exposure when available on the OS.        |
-| `title`                 | `string`  | Optional picker title.                                   |
-| `showDoneButton`        | `boolean` | Shows a top-right Done button.                           |
-| `doneButtonTitle`       | `string`  | Custom title for the Done button.                        |
-| `detents`               | `ColorPickerDetent[]` | Sheet detents. Supports `medium`/`large` and custom `height`/`fraction` detents. |
-| `selectedDetentIdentifier` | `string` | Initially selected detent. Use `medium`, `large`, or a custom detent identifier. |
-| `largestUndimmedDetentIdentifier` | `string` | Largest detent that keeps the presenting view undimmed. |
-| `prefersGrabberVisible` | `boolean` | Shows the sheet grabber.                                 |
+| Option                            | Type                  | Description                                                                      |
+| --------------------------------- | --------------------- | -------------------------------------------------------------------------------- |
+| `selectedColor`                   | `string`              | Initial color. Supports `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA`.             |
+| `supportsAlpha`                   | `boolean`             | Shows the alpha slider. Defaults to `true`.                                      |
+| `supportsEyedropper`              | `boolean`             | Enables eyedropper support when available on the OS.                             |
+| `maximumLinearExposure`           | `number`              | Maximum linear exposure when available on the OS.                                |
+| `title`                           | `string`              | Optional picker title.                                                           |
+| `showDoneButton`                  | `boolean`             | Shows a top-right Done button.                                                   |
+| `doneButtonTitle`                 | `string`              | Custom title for the Done button.                                                |
+| `detents`                         | `ColorPickerDetent[]` | Sheet detents. Supports `medium`/`large` and custom `height`/`fraction` detents. |
+| `selectedDetentIdentifier`        | `string`              | Initially selected detent. Use `medium`, `large`, or a custom detent identifier. |
+| `largestUndimmedDetentIdentifier` | `string`              | Largest detent that keeps the presenting view undimmed.                          |
+| `prefersGrabberVisible`           | `boolean`             | Shows the sheet grabber.                                                         |
 
 ```tsx
 type ColorPickerDetent = {
@@ -510,6 +592,52 @@ type ColorPickerResult = {
   alpha: number;
 };
 ```
+
+### `canSendMail()`
+
+Returns whether the current device is configured to send mail with the native
+iOS mail composer. Returns `false` when the `Mail` native feature was not
+selected.
+
+```tsx
+canSendMail(): boolean
+```
+
+### `openMail()`
+
+Shows the native iOS `MFMailComposeViewController` when available. Otherwise,
+opens `mailto:` with the first value in `recipients`.
+
+```tsx
+openMail(options?: MailOptions): Promise<'sent' | 'saved' | 'cancelled' | 'opened'>
+```
+
+**Options:**
+
+| Option          | Type               | Description                              |
+| --------------- | ------------------ | ---------------------------------------- |
+| `subject`       | `string`           | Initial email subject.                   |
+| `recipients`    | `string[]`         | Initial To recipients.                   |
+| `ccRecipients`  | `string[]`         | Initial Cc recipients.                   |
+| `bccRecipients` | `string[]`         | Initial Bcc recipients.                  |
+| `body`          | `string`           | Initial email body.                      |
+| `isHTML`        | `boolean`          | Whether `body` contains HTML.            |
+| `attachments`   | `MailAttachment[]` | Local files attached to the email draft. |
+
+```tsx
+type MailAttachment = {
+  path?: string; // Absolute local path; use either path or uri
+  uri?: string; // Local file URI
+  type?: string; // File extension or MIME type
+  mimeType?: string; // Explicit MIME type; takes precedence over type
+  name?: string; // File name shown in the composer
+};
+```
+
+`openMail` rejects when another composer is already open, an attachment cannot
+be read, or the system cannot open the fallback URL. Attachments must use a
+local path or a `file://` URI. The `mailto:` fallback only receives the first
+recipient; the remaining options and attachments are not forwarded.
 
 ## Apps Using This Library
 

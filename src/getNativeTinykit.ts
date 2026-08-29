@@ -25,7 +25,8 @@ export function getNativeTinykitFeature(feature: TinykitFeature): Spec {
   if (!enabledFeatures.has(feature)) {
     throw new Error(
       `[TinyKit] The ${feature} feature is not installed. ` +
-        `Add '${feature}' to setup_tinykit in your Podfile and run pod install.`
+        `Add '${feature}' to the 'react-native-tinykit.features' array ` +
+        `in package.json and run pod install.`
     );
   }
 

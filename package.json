@@ -45,7 +45,6 @@
       "types": "./lib/typescript/src/mail.d.ts",
       "default": "./lib/module/mail.js"
     },
-    "./scripts/setup.rb": "./scripts/setup.rb",
     "./package.json": "./package.json"
   },
   "files": [
@@ -54,7 +53,6 @@
     "android",
     "ios",
     "cpp",
-    "scripts",
     "*.podspec",
     "react-native.config.js",
     "!ios/build",

@@ -46,28 +46,15 @@ required.
 
 #### Optional native feature selection
 
-To reduce the native code compiled into your app, load the TinyKit setup script
-in your `Podfile` and select the features you use:
+To reduce the native code compiled into your app, add the features you use to
+your app's `package.json`:
 
-```ruby
-def node_require(script)
-  require Pod::Executable.execute_command('node', ['-p',
-    "require.resolve(
-      '#{script}',
-      {paths: [process.argv[1]]},
-    )", __dir__]).strip
-end
-
-node_require('react-native/scripts/react_native_pods.rb')
-node_require('react-native-tinykit/scripts/setup.rb')
-
-platform :ios, '16.0'
-prepare_react_native_project!
-
-setup_tinykit([
-  'Haptics',
-  'KeepAwake',
-])
+```json
+{
+  "react-native-tinykit": {
+    "features": ["Haptics", "KeepAwake"]
+  }
+}
 ```
 
 Available features:
@@ -80,10 +67,10 @@ Available features:
 - `Haptics`
 - `Mail`
 
-Use `setup_tinykit([])` to compile only the TurboModule core. Run `pod install`
-again whenever this list changes. Calling most APIs whose native feature was
-not selected throws an error that names the missing feature. `openMail` instead
-falls back to the system `mailto:` URL.
+Use an empty `features` array to compile only the TurboModule core. Run
+`pod install` again whenever this list changes. Calling most APIs whose native
+feature was not selected throws an error that names the missing feature.
+`openMail` instead falls back to the system `mailto:` URL.
 
 Feature-specific JavaScript entry points are also available:
 
@@ -95,7 +82,7 @@ import { openMail } from 'react-native-tinykit/mail';
 
 The root `react-native-tinykit` imports remain supported for backwards
 compatibility. JavaScript entry points provide cleaner dependency boundaries;
-`setup_tinykit` controls which native source files are compiled.
+`react-native-tinykit.features` controls which native source files are compiled.
 
 ## Usage
 

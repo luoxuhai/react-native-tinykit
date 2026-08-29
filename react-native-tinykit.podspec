@@ -1,4 +1,5 @@
 require "json"
+require "pathname"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
@@ -38,16 +39,45 @@ features = {
   },
 }
 
-configured_features = ENV["REACT_NATIVE_TINYKIT_FEATURES"]
-selected_feature_names = if configured_features.nil?
-  features.keys
-else
-  configured_features.split(",").map(&:strip).reject(&:empty?)
+configured_features = nil
+app_path = ENV["APP_PATH"]
+
+unless app_path.nil? || app_path.empty?
+  app_root = Pathname.new(app_path)
+  unless app_root.absolute?
+    app_root = Pod::Config.instance.installation_root.join(app_root)
+  end
+
+  app_package_path = app_root.join("package.json").cleanpath
+  if app_package_path.file?
+    app_package = JSON.parse(File.read(app_package_path))
+    tinykit_config = app_package["react-native-tinykit"]
+
+    unless tinykit_config.nil?
+      unless tinykit_config.is_a?(Hash)
+        raise "react-native-tinykit in #{app_package_path} must be an object"
+      end
+
+      configured_features = tinykit_config["features"]
+      unless configured_features.is_a?(Array) && configured_features.all? { |feature| feature.is_a?(String) }
+        raise "react-native-tinykit.features in #{app_package_path} must be an array of strings"
+      end
+    end
+  end
 end
+
+selected_feature_names = configured_features.nil? ? features.keys : configured_features.uniq
 
 unknown_features = selected_feature_names - features.keys
 unless unknown_features.empty?
-  raise "Unknown react-native-tinykit features: #{unknown_features.join(', ')}"
+  raise "Unknown react-native-tinykit features: #{unknown_features.join(', ')}. " \
+    "Available features: #{features.keys.join(', ')}"
+end
+
+if defined?(Pod::UI)
+  selection = selected_feature_names.empty? ? "Core only" : selected_feature_names.join(", ")
+  source = configured_features.nil? ? "defaults" : "package.json"
+  Pod::UI.puts "[TinyKit] Enabled features from #{source}: #{selection}"
 end
 
 selected_features = selected_feature_names.map { |name| features.fetch(name) }

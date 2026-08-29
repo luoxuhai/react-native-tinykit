@@ -19,7 +19,8 @@
 static void TinykitLogMissingFeature(NSString *feature)
 {
   RCTLogError(
-    @"[TinyKit] The %@ feature is not installed. Add '%@' to setup_tinykit in your Podfile and run pod install.",
+    @"[TinyKit] The %@ feature is not installed. Add '%@' to the "
+    @"'react-native-tinykit.features' array in package.json and run pod install.",
     feature,
     feature
   );
@@ -111,7 +112,11 @@ static void TinykitLogMissingFeature(NSString *feature)
 #if TINYKIT_FEATURE_REVIEW
   [TinykitReview requestReviewWithResolve:resolve rejecter:reject];
 #else
-  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Review is not installed. Add 'Review' to setup_tinykit.", nil);
+  reject(
+    @"E_FEATURE_NOT_INSTALLED",
+    @"TinyKit Review is not installed. Add 'Review' to the 'react-native-tinykit.features' array in package.json and run pod install.",
+    nil
+  );
 #endif
 }
 
@@ -256,7 +261,11 @@ static void TinykitLogMissingFeature(NSString *feature)
 
   [_colorPicker showColorPicker:pickerOptions resolve:resolve rejecter:reject];
 #else
-  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit ColorPicker is not installed. Add 'ColorPicker' to setup_tinykit.", nil);
+  reject(
+    @"E_FEATURE_NOT_INSTALLED",
+    @"TinyKit ColorPicker is not installed. Add 'ColorPicker' to the 'react-native-tinykit.features' array in package.json and run pod install.",
+    nil
+  );
 #endif
 }
 
@@ -378,7 +387,11 @@ static void TinykitLogMissingFeature(NSString *feature)
     dispatch_async(dispatch_get_main_queue(), presentMail);
   }
 #else
-  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Mail is not installed. Add 'Mail' to setup_tinykit.", nil);
+  reject(
+    @"E_FEATURE_NOT_INSTALLED",
+    @"TinyKit Mail is not installed. Add 'Mail' to the 'react-native-tinykit.features' array in package.json and run pod install.",
+    nil
+  );
 #endif
 }
 

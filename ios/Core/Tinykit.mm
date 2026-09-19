@@ -8,7 +8,8 @@
 
 #if TINYKIT_FEATURE_RESTART || TINYKIT_FEATURE_THERMAL_STATE || TINYKIT_FEATURE_REVIEW || \
   TINYKIT_FEATURE_KEEP_AWAKE || TINYKIT_FEATURE_COLOR_PICKER || TINYKIT_FEATURE_HAPTICS || \
-  TINYKIT_FEATURE_MAIL
+  TINYKIT_FEATURE_MAIL || TINYKIT_FEATURE_TOAST || TINYKIT_FEATURE_ALERT || TINYKIT_FEATURE_CONFETTI || \
+  TINYKIT_FEATURE_TRANSLATION
 #if __has_include(<react_native_tinykit/react_native_tinykit-Swift.h>)
 #import <react_native_tinykit/react_native_tinykit-Swift.h>
 #else
@@ -36,6 +37,18 @@ static void TinykitLogMissingFeature(NSString *feature)
 #if TINYKIT_FEATURE_MAIL
   TinykitMail *_mail;
 #endif
+#if TINYKIT_FEATURE_TOAST
+  TinykitToast *_toast;
+#endif
+#if TINYKIT_FEATURE_ALERT
+  TinykitAlert *_alert;
+#endif
+#if TINYKIT_FEATURE_CONFETTI
+  TinykitConfetti *_confetti;
+#endif
+#if TINYKIT_FEATURE_TRANSLATION
+  TinykitTranslation *_translation;
+#endif
 }
 
 - (NSArray<NSString *> *)getEnabledFeatures
@@ -62,6 +75,18 @@ static void TinykitLogMissingFeature(NSString *feature)
 #endif
 #if TINYKIT_FEATURE_MAIL
   [features addObject:@"Mail"];
+#endif
+#if TINYKIT_FEATURE_TOAST
+  [features addObject:@"Toast"];
+#endif
+#if TINYKIT_FEATURE_ALERT
+  [features addObject:@"Alert"];
+#endif
+#if TINYKIT_FEATURE_CONFETTI
+  [features addObject:@"Confetti"];
+#endif
+#if TINYKIT_FEATURE_TRANSLATION
+  [features addObject:@"Translation"];
 #endif
 
   return features;
@@ -393,6 +418,166 @@ static void TinykitLogMissingFeature(NSString *feature)
     nil
   );
 #endif
+}
+
+- (void)showToast:(JS::NativeTinykit::ToastOptions &)options
+          resolve:(RCTPromiseResolveBlock)resolve
+           reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_TOAST
+  NSDictionary *toastOptions = @{
+    @"title": options.title() ?: @"",
+    @"message": options.message() ?: @"",
+    @"icon": options.icon() ?: @"done",
+    @"haptic": options.haptic() ?: @"none",
+  };
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_toast == nil) {
+      self->_toast = [TinykitToast new];
+    }
+    [self->_toast show:toastOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Toast is not installed. Add 'Toast' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)showAlert:(JS::NativeTinykit::AlertOptions &)options
+          resolve:(RCTPromiseResolveBlock)resolve
+           reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_ALERT
+  NSDictionary *alertOptions = @{
+    @"title": options.title() ?: @"",
+    @"message": options.message() ?: @"",
+    @"icon": options.icon() ?: @"done",
+    @"haptic": options.haptic() ?: @"none",
+    @"duration": @(options.duration().value_or(2000)),
+  };
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_alert == nil) {
+      self->_alert = [TinykitAlert new];
+    }
+    [self->_alert show:alertOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Alert is not installed. Add 'Alert' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)dismissAllAlerts:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_ALERT
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self->_alert dismissAll];
+    resolve(nil);
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Alert is not installed. Add 'Alert' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)startConfetti:(JS::NativeTinykit::ConfettiOptions &)options
+             resolve:(RCTPromiseResolveBlock)resolve
+              reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_CONFETTI
+  NSDictionary *confettiOptions = @{@"duration": @(options.duration().value_or(2000))};
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_confetti == nil) {
+      self->_confetti = [TinykitConfetti new];
+    }
+    [self->_confetti start:confettiOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Confetti is not installed. Add 'Confetti' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)stopConfetti:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_CONFETTI
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self->_confetti stop];
+    resolve(nil);
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Confetti is not installed. Add 'Confetti' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (NSNumber *)isTranslationSupported
+{
+#if TINYKIT_FEATURE_TRANSLATION
+  return @([TinykitTranslation isSupported]);
+#else
+  return @NO;
+#endif
+}
+
+- (void)showTranslation:(JS::NativeTinykit::NativeTranslationOptions &)options
+                resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_TRANSLATION
+  NSMutableDictionary *translationOptions = [@{
+    @"text": options.text(),
+    @"arrowEdge": options.arrowEdge() ?: @"top",
+    @"allowsReplacement": @(options.allowsReplacement().value_or(false)),
+  } mutableCopy];
+  auto anchor = options.anchor();
+  if (anchor.has_value()) {
+    translationOptions[@"anchor"] = @{
+      @"x": @(anchor->x()), @"y": @(anchor->y()),
+      @"width": @(anchor->width()), @"height": @(anchor->height()),
+    };
+  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_translation == nil) {
+      self->_translation = [TinykitTranslation new];
+    }
+    [self->_translation show:translationOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Translation is not installed. Add 'Translation' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)dismissTranslation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_TRANSLATION
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_translation == nil) {
+      resolve(nil);
+    } else {
+      [self->_translation dismiss:resolve];
+    }
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit Translation is not installed. Add 'Translation' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)invalidate
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+#if TINYKIT_FEATURE_TOAST
+    [self->_toast invalidate];
+    self->_toast = nil;
+#endif
+#if TINYKIT_FEATURE_ALERT
+    [self->_alert dismissAll];
+    self->_alert = nil;
+#endif
+#if TINYKIT_FEATURE_CONFETTI
+    [self->_confetti stop];
+    self->_confetti = nil;
+#endif
+#if TINYKIT_FEATURE_TRANSLATION
+    [self->_translation invalidate];
+    self->_translation = nil;
+#endif
+  });
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

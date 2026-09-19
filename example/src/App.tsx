@@ -1,4 +1,10 @@
-import { useEffect, useState, useCallback } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  type ComponentRef,
+} from 'react';
 import {
   Text,
   View,
@@ -17,6 +23,10 @@ import {
   deactivate,
   showColorPicker,
   openMail,
+  Toast,
+  Alert,
+  Confetti,
+  Translation,
   type ThermalState,
 } from 'react-native-tinykit';
 
@@ -25,6 +35,32 @@ export default function App() {
     getThermalState()
   );
   const [keepAwake, setKeepAwake] = useState(false);
+  const translationTarget = useRef<ComponentRef<typeof Text>>(null);
+  const [translationText, setTranslationText] = useState('Hello, world! 👋');
+  const [translationStatus, setTranslationStatus] = useState('');
+  const [translating, setTranslating] = useState(false);
+  const translationSupported = Translation.isSupported();
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      const result = await Translation.present({
+        text: translationText,
+        targetViewNode: translationTarget.current,
+        allowsReplacement: true,
+      });
+      if (result.status === 'replaced' && result.translatedText !== undefined) {
+        setTranslationText(result.translatedText);
+      }
+      setTranslationStatus(result.status);
+    } catch (error) {
+      setTranslationStatus(
+        error instanceof Error ? error.message : String(error)
+      );
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const handleToggleKeepAwake = useCallback(() => {
     if (keepAwake) {
@@ -220,6 +256,117 @@ export default function App() {
               Requires a Mail account configured on the device.
             </Text>
           </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Toast API</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Toast.show({
+                  title: 'Saved',
+                  message: 'Your changes are ready',
+                  icon: 'done',
+                  haptic: 'success',
+                }).catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Show Toast</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Alert API</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Alert.show({
+                  title: 'Done',
+                  icon: 'heart',
+                  haptic: 'success',
+                  duration: 2000,
+                }).catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Show Alert</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Alert.show({
+                  title: 'Loading',
+                  icon: 'spinner',
+                  duration: 0,
+                }).catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Show Persistent Spinner</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Alert.dismissAll().catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Dismiss Alerts</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Confetti API</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Confetti.start({ duration: 5000 }).catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Start Confetti</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Confetti.stop().catch(console.error);
+              }}
+            >
+              <Text style={styles.buttonText}>Stop Confetti</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Translation API</Text>
+          <Text ref={translationTarget} style={styles.description}>
+            {translationText}
+          </Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleTranslate}
+            disabled={!translationSupported || translating}
+            accessibilityState={{
+              disabled: !translationSupported || translating,
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {translating ? 'Translating…' : 'Translate Text'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setTranslationText('Hello, world! 👋');
+              setTranslationStatus('');
+            }}
+            disabled={translating}
+          >
+            <Text style={styles.buttonText}>Reset Text</Text>
+          </TouchableOpacity>
+          <Text style={styles.hint}>
+            {translationSupported
+              ? 'Choose Replace Translation to update the text above.'
+              : 'Requires a physical iPhone or iPad running iOS 17.4 or later.'}
+          </Text>
+          <Text accessibilityLiveRegion="polite" style={styles.hint}>
+            {translationStatus}
+          </Text>
         </View>
 
         <View style={styles.footer}>

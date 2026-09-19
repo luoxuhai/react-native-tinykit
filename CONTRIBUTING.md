@@ -75,6 +75,60 @@ To fix formatting errors, run the following:
 yarn lint --fix
 ```
 
+### Source layout
+
+Each native feature has its own directory in `src`, named to match the feature
+in `ios` and the `react-native-tinykit.features` configuration:
+
+```text
+src/
+  index.ts
+  Alert/index.ts
+  ColorPicker/index.ts
+  Confetti/index.ts
+  Haptics/index.ts
+  KeepAwake/index.tsx
+  Mail/index.ts
+  Restart/index.ts
+  Review/index.ts
+  ThermalState/index.ts
+  Toast/index.ts
+  Translation/index.ts
+  utils/
+    NativeTinykit.ts
+    getNativeTinykit.ts
+```
+
+`index.ts` contains the root public exports. Feature directories contain their
+JavaScript API wrappers, hooks and components. `utils/NativeTinykit.ts` keeps
+the TurboModule specification and its Codegen types together;
+`utils/getNativeTinykit.ts` handles lazy module access and feature availability.
+Codegen scans only `src/utils`.
+
+Public subpath imports remain lowercase and use hyphens, such as
+`react-native-tinykit/color-picker`. When adding or moving a feature, update all
+three `package.json` export targets (`source`, `types`, `default`) as well as
+the root exports.
+
+### Overlay validation
+
+Run the public API regression checks with `yarn test:overlays`. To check optional
+Pod selection and the upstream Git release pins, run
+`ruby tests/overlay_pods_test.rb` using the same Ruby environment as CocoaPods
+(for example, `rbenv exec ruby tests/overlay_pods_test.rb`).
+
+For the example app, run `pod install` from `example/ios`, then
+`yarn example start` and `yarn example ios` from the repository root. The Metro
+configuration uses the standard port and watches the library through
+`react-native-monorepo-config`. `yarn example build:ios` builds in Debug mode.
+
+For a simulator-only build without launching Metro or signing:
+
+```sh
+xcodebuild -workspace example/ios/TinykitExample.xcworkspace \
+  -scheme TinykitExample -configuration Debug -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+```
 
 
 ### Publishing to npm

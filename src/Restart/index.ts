@@ -1,4 +1,4 @@
-import { getNativeTinykitFeature } from './getNativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
 
 /**
  * Restarts the React Native application.

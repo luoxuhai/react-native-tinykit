@@ -1,4 +1,4 @@
-import { getNativeTinykitFeature } from './getNativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
 
 /**
  * Requests a review of the app.

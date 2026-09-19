@@ -57,6 +57,51 @@ export type MailOptions = {
 
 export type MailResult = 'sent' | 'saved' | 'cancelled' | 'opened';
 
+export type OverlayHaptic = 'success' | 'warning' | 'error' | 'none';
+
+export type ToastOptions = {
+  title?: string;
+  message?: string;
+  icon?: 'done' | 'error';
+  haptic?: OverlayHaptic;
+};
+
+export type AlertOptions = {
+  title?: string;
+  message?: string;
+  /** Milliseconds. Defaults to 2000; zero or negative disables auto-dismiss. */
+  duration?: CodegenTypes.Double;
+  icon?: 'done' | 'error' | 'spinner' | 'heart';
+  haptic?: OverlayHaptic;
+};
+
+export type ConfettiOptions = {
+  /** Milliseconds. Defaults to 2000. */
+  duration?: CodegenTypes.Double;
+};
+
+export type TranslationAnchor = {
+  /** Rectangle in window coordinates, in points. */
+  x: CodegenTypes.Double;
+  y: CodegenTypes.Double;
+  width: CodegenTypes.Double;
+  height: CodegenTypes.Double;
+};
+
+export type NativeTranslationOptions = {
+  text: string;
+  anchor?: TranslationAnchor;
+  arrowEdge?: 'top' | 'bottom' | 'leading' | 'trailing';
+  /** Offer the system Replace Translation action. Defaults to false. */
+  allowsReplacement?: boolean;
+};
+
+export type TranslationResult = {
+  status: 'dismissed' | 'replaced';
+  /** Present only when the user chooses Replace Translation. */
+  translatedText?: string;
+};
+
 export type ColorPickerDetent = {
   /**
    * Detent type. Use 'medium' or 'large' for system detents, or 'custom' with height or fraction.
@@ -150,6 +195,16 @@ export interface Spec extends TurboModule {
   notification(type: string): void;
   canSendMail(): boolean;
   openMail(options: MailOptions): Promise<MailResult>;
+  showToast(options: ToastOptions): Promise<void>;
+  showAlert(options: AlertOptions): Promise<void>;
+  dismissAllAlerts(): Promise<void>;
+  startConfetti(options: ConfettiOptions): Promise<void>;
+  stopConfetti(): Promise<void>;
+  isTranslationSupported(): boolean;
+  showTranslation(
+    options: NativeTranslationOptions
+  ): Promise<TranslationResult>;
+  dismissTranslation(): Promise<void>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Tinykit');

@@ -1,13 +1,13 @@
-import { getNativeTinykitFeature } from './getNativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
 import type {
   ImpactFeedbackStyle,
   NotificationFeedbackType,
-} from './NativeTinykit';
+} from '../utils/NativeTinykit';
 
 export type {
   ImpactFeedbackStyle,
   NotificationFeedbackType,
-} from './NativeTinykit';
+} from '../utils/NativeTinykit';
 
 /**
  * Triggers an impact haptic feedback.

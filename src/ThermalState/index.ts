@@ -1,7 +1,7 @@
-import { getNativeTinykitFeature } from './getNativeTinykit';
-import type { ThermalState } from './NativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
+import type { ThermalState } from '../utils/NativeTinykit';
 
-export type { ThermalState } from './NativeTinykit';
+export type { ThermalState } from '../utils/NativeTinykit';
 
 export type ThermalStateListener = (state: ThermalState) => void;
 

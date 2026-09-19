@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getNativeTinykitFeature } from './getNativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
 
 /**
  * Prevents the screen from auto-locking.

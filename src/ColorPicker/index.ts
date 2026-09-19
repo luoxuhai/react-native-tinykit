@@ -1,11 +1,14 @@
-import { getNativeTinykitFeature } from './getNativeTinykit';
-import type { ColorPickerOptions, ColorPickerResult } from './NativeTinykit';
+import { getNativeTinykitFeature } from '../utils/getNativeTinykit';
+import type {
+  ColorPickerOptions,
+  ColorPickerResult,
+} from '../utils/NativeTinykit';
 
 export type {
   ColorPickerDetent,
   ColorPickerOptions,
   ColorPickerResult,
-} from './NativeTinykit';
+} from '../utils/NativeTinykit';
 
 /**
  * Shows the native iOS color picker.

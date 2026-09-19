@@ -8,7 +8,11 @@ export type TinykitFeature =
   | 'KeepAwake'
   | 'ColorPicker'
   | 'Haptics'
-  | 'Mail';
+  | 'Mail'
+  | 'Toast'
+  | 'Alert'
+  | 'Confetti'
+  | 'Translation';
 
 let nativeTinykit: Spec | undefined;
 let enabledFeatures: ReadonlySet<string> | undefined;

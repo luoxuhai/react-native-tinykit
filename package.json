@@ -1,57 +1,79 @@
 {
   "name": "react-native-tinykit",
   "version": "0.10.0",
-  "description": "A lightweight React Native toolkit for iOS, providing essential native utilities (Zero dependencies)",
+  "description": "A lightweight React Native toolkit for iOS with native utilities and optional SPIndicator, SPAlert and SPConfetti overlays",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
     ".": {
-      "source": "./src/index.tsx",
+      "source": "./src/index.ts",
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
     "./restart": {
-      "source": "./src/restart.ts",
-      "types": "./lib/typescript/src/restart.d.ts",
-      "default": "./lib/module/restart.js"
+      "source": "./src/Restart/index.ts",
+      "types": "./lib/typescript/src/Restart/index.d.ts",
+      "default": "./lib/module/Restart/index.js"
     },
     "./thermal-state": {
-      "source": "./src/thermal-state.ts",
-      "types": "./lib/typescript/src/thermal-state.d.ts",
-      "default": "./lib/module/thermal-state.js"
+      "source": "./src/ThermalState/index.ts",
+      "types": "./lib/typescript/src/ThermalState/index.d.ts",
+      "default": "./lib/module/ThermalState/index.js"
     },
     "./review": {
-      "source": "./src/review.ts",
-      "types": "./lib/typescript/src/review.d.ts",
-      "default": "./lib/module/review.js"
+      "source": "./src/Review/index.ts",
+      "types": "./lib/typescript/src/Review/index.d.ts",
+      "default": "./lib/module/Review/index.js"
     },
     "./keep-awake": {
-      "source": "./src/keep-awake.tsx",
-      "types": "./lib/typescript/src/keep-awake.d.ts",
-      "default": "./lib/module/keep-awake.js"
+      "source": "./src/KeepAwake/index.tsx",
+      "types": "./lib/typescript/src/KeepAwake/index.d.ts",
+      "default": "./lib/module/KeepAwake/index.js"
     },
     "./color-picker": {
-      "source": "./src/color-picker.ts",
-      "types": "./lib/typescript/src/color-picker.d.ts",
-      "default": "./lib/module/color-picker.js"
+      "source": "./src/ColorPicker/index.ts",
+      "types": "./lib/typescript/src/ColorPicker/index.d.ts",
+      "default": "./lib/module/ColorPicker/index.js"
     },
     "./haptics": {
-      "source": "./src/haptics.ts",
-      "types": "./lib/typescript/src/haptics.d.ts",
-      "default": "./lib/module/haptics.js"
+      "source": "./src/Haptics/index.ts",
+      "types": "./lib/typescript/src/Haptics/index.d.ts",
+      "default": "./lib/module/Haptics/index.js"
     },
     "./mail": {
-      "source": "./src/mail.ts",
-      "types": "./lib/typescript/src/mail.d.ts",
-      "default": "./lib/module/mail.js"
+      "source": "./src/Mail/index.ts",
+      "types": "./lib/typescript/src/Mail/index.d.ts",
+      "default": "./lib/module/Mail/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./toast": {
+      "source": "./src/Toast/index.ts",
+      "types": "./lib/typescript/src/Toast/index.d.ts",
+      "default": "./lib/module/Toast/index.js"
+    },
+    "./alert": {
+      "source": "./src/Alert/index.ts",
+      "types": "./lib/typescript/src/Alert/index.d.ts",
+      "default": "./lib/module/Alert/index.js"
+    },
+    "./confetti": {
+      "source": "./src/Confetti/index.ts",
+      "types": "./lib/typescript/src/Confetti/index.d.ts",
+      "default": "./lib/module/Confetti/index.js"
+    },
+    "./scripts/overlay_pods.rb": "./scripts/overlay_pods.rb",
+    "./translation": {
+      "source": "./src/Translation/index.ts",
+      "types": "./lib/typescript/src/Translation/index.d.ts",
+      "default": "./lib/module/Translation/index.js"
+    }
   },
   "files": [
     "src",
     "lib",
     "android",
     "ios",
+    "scripts",
     "cpp",
     "*.podspec",
     "react-native.config.js",
@@ -71,8 +93,10 @@
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "typecheck": "tsc",
+    "test:overlays": "node --test tests/overlays.test.cjs",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "release": "release-it --only-version"
+    "release": "release-it --only-version",
+    "test:translation": "node --test tests/translation.test.cjs"
   },
   "keywords": [
     "react-native",
@@ -141,7 +165,7 @@
   "codegenConfig": {
     "name": "TinykitSpec",
     "type": "modules",
-    "jsSrcsDir": "src",
+    "jsSrcsDir": "src/utils",
     "android": {
       "javaPackageName": "com.tinykit"
     }

@@ -1,5 +1,6 @@
 require "json"
 require "pathname"
+require_relative "scripts/overlay_pods"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
@@ -36,6 +37,27 @@ features = {
     :source_files => "ios/Mail/**/*.{h,m,mm,swift,cpp}",
     :definition => "TINYKIT_FEATURE_MAIL=1",
     :frameworks => ["MessageUI", "UIKit", "UniformTypeIdentifiers"],
+  },
+  "Toast" => {
+    :source_files => "ios/Toast/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_TOAST=1",
+    :frameworks => ["UIKit"],
+  },
+  "Alert" => {
+    :source_files => "ios/Alert/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_ALERT=1",
+    :frameworks => ["UIKit"],
+  },
+  "Confetti" => {
+    :source_files => "ios/Confetti/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_CONFETTI=1",
+    :frameworks => ["UIKit"],
+  },
+  "Translation" => {
+    :source_files => "ios/Translation/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_TRANSLATION=1",
+    :frameworks => ["UIKit", "SwiftUI"],
+    :weak_frameworks => ["Translation"],
   },
 }
 
@@ -84,6 +106,7 @@ selected_features = selected_feature_names.map { |name| features.fetch(name) }
 source_files = ["ios/Core/**/*.{h,m,mm,swift,cpp}"] + selected_features.map { |feature| feature[:source_files] }
 definitions = selected_features.map { |feature| feature[:definition] }
 frameworks = selected_features.flat_map { |feature| feature.fetch(:frameworks, []) }.uniq
+weak_frameworks = selected_features.flat_map { |feature| feature.fetch(:weak_frameworks, []) }.uniq
 
 Pod::Spec.new do |s|
   s.name         = "react-native-tinykit"
@@ -93,15 +116,23 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "16.0" }
+  s.platforms    = { :ios => "17.0" }
   s.source       = { :git => "https://github.com/luoxuhai/react-native-tinykit.git", :tag => "#{s.version}" }
 
   s.source_files = source_files
   s.private_header_files = "ios/Core/**/*.h"
+  s.swift_version = "5.0"
   s.frameworks = frameworks unless frameworks.empty?
+  s.weak_frameworks = weak_frameworks unless weak_frameworks.empty?
+  s.preserve_paths = "ios/Translation/LICENSE"
   s.pod_target_xcconfig = {
     "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) #{definitions.join(' ')}",
   }
 
   install_modules_dependencies(s)
+
+  selected_feature_names.each do |feature|
+    dependency = TinykitOverlayPods::DEPENDENCIES[feature]
+    s.dependency dependency[:name], dependency[:version] unless dependency.nil?
+  end
 end

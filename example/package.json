@@ -10,7 +10,11 @@
       "KeepAwake",
       "ColorPicker",
       "Haptics",
-      "Mail"
+      "Mail",
+      "Toast",
+      "Alert",
+      "Confetti",
+      "Translation"
     ]
   },
   "scripts": {

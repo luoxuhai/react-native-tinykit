@@ -1,8 +1,15 @@
 import { Linking } from 'react-native';
-import { getNativeTinykit, getNativeTinykitFeature } from './getNativeTinykit';
-import type { MailOptions, MailResult } from './NativeTinykit';
+import {
+  getNativeTinykit,
+  getNativeTinykitFeature,
+} from '../utils/getNativeTinykit';
+import type { MailOptions, MailResult } from '../utils/NativeTinykit';
 
-export type { MailAttachment, MailOptions, MailResult } from './NativeTinykit';
+export type {
+  MailAttachment,
+  MailOptions,
+  MailResult,
+} from '../utils/NativeTinykit';
 
 /**
  * Returns whether the device is configured to send mail with the native iOS

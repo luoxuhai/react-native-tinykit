@@ -23,6 +23,7 @@ export {
 } from './Mail';
 export { restart } from './Restart';
 export { requestReview } from './Review';
+export { uuid } from './UUID';
 export {
   getThermalState,
   onThermalStateChange,

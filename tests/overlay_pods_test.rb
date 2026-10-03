@@ -89,4 +89,14 @@ class OverlayPodsTest < Minitest::Test
       end
     end
   end
+
+  def test_uuid_can_be_excluded_from_the_native_feature_list
+    [[], ["UUID"]].each do |features|
+      with_config({ "react-native-tinykit" => { "features" => features } }) do
+        spec = Pod::Specification.from_file(File.expand_path("../react-native-tinykit.podspec", __dir__))
+        definitions = spec.attributes_hash.fetch("pod_target_xcconfig").fetch("GCC_PREPROCESSOR_DEFINITIONS")
+        assert_equal features.include?("UUID"), definitions.include?("TINYKIT_FEATURE_UUID=1")
+      end
+    end
+  end
 end

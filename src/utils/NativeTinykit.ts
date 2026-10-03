@@ -181,6 +181,7 @@ export type ColorPickerResult = {
 
 export interface Spec extends TurboModule {
   getEnabledFeatures(): ReadonlyArray<string>;
+  uuid(): string;
   restart(): void;
   getThermalState(): ThermalState;
   startThermalStateMonitoring(): void;

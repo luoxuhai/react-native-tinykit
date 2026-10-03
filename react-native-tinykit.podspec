@@ -5,6 +5,9 @@ require_relative "scripts/overlay_pods"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 features = {
+  "UUID" => {
+    :definition => "TINYKIT_FEATURE_UUID=1",
+  },
   "Restart" => {
     :source_files => "ios/Restart/**/*.{h,m,mm,swift,cpp}",
     :definition => "TINYKIT_FEATURE_RESTART=1",
@@ -103,7 +106,7 @@ if defined?(Pod::UI)
 end
 
 selected_features = selected_feature_names.map { |name| features.fetch(name) }
-source_files = ["ios/Core/**/*.{h,m,mm,swift,cpp}"] + selected_features.map { |feature| feature[:source_files] }
+source_files = ["ios/Core/**/*.{h,m,mm,swift,cpp}"] + selected_features.filter_map { |feature| feature[:source_files] }
 definitions = selected_features.map { |feature| feature[:definition] }
 frameworks = selected_features.flat_map { |feature| feature.fetch(:frameworks, []) }.uniq
 weak_frameworks = selected_features.flat_map { |feature| feature.fetch(:weak_frameworks, []) }.uniq

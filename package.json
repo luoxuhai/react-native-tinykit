@@ -25,6 +25,11 @@
       "types": "./lib/typescript/src/Review/index.d.ts",
       "default": "./lib/module/Review/index.js"
     },
+    "./uuid": {
+      "source": "./src/UUID/index.ts",
+      "types": "./lib/typescript/src/UUID/index.d.ts",
+      "default": "./lib/module/UUID/index.js"
+    },
     "./keep-awake": {
       "source": "./src/KeepAwake/index.tsx",
       "types": "./lib/typescript/src/KeepAwake/index.d.ts",

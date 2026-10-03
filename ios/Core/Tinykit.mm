@@ -58,6 +58,9 @@ static void TinykitLogMissingFeature(NSString *feature)
 #if TINYKIT_FEATURE_RESTART
   [features addObject:@"Restart"];
 #endif
+#if TINYKIT_FEATURE_UUID
+  [features addObject:@"UUID"];
+#endif
 #if TINYKIT_FEATURE_THERMAL_STATE
   [features addObject:@"ThermalState"];
 #endif
@@ -90,6 +93,16 @@ static void TinykitLogMissingFeature(NSString *feature)
 #endif
 
   return features;
+}
+
+- (NSString *)uuid
+{
+#if TINYKIT_FEATURE_UUID
+  return [[NSUUID UUID] UUIDString];
+#else
+  TinykitLogMissingFeature(@"UUID");
+  return @"";
+#endif
 }
 
 - (void)restart

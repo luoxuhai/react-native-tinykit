@@ -2,6 +2,7 @@ import { TurboModuleRegistry } from 'react-native';
 import type { Spec } from './NativeTinykit';
 
 export type TinykitFeature =
+  | 'UUID'
   | 'Restart'
   | 'ThermalState'
   | 'Review'

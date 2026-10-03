@@ -14,6 +14,7 @@ interactions to TypeScript, with native features you can include individually.
 | Feature                        | What it does                                                  |
 | ------------------------------ | ------------------------------------------------------------- |
 | [Restart](#restart)            | Reload the React Native application                           |
+| [UUID](#uuid)                  | Generate random UUID version 4 strings                        |
 | [ThermalState](#thermal-state) | Read and monitor the device's thermal state                   |
 | [Review](#app-review)          | Request an App Store review                                   |
 | [KeepAwake](#keep-awake)       | Prevent automatic screen locking                              |
@@ -177,6 +178,18 @@ clear persisted data.
 import { restart } from 'react-native-tinykit';
 
 restart();
+```
+
+## UUID
+
+`uuid(): string` synchronously returns a random RFC 4122 version 4 UUID generated
+by Foundation's `NSUUID.UUID.UUIDString`. Add `UUID` to
+`react-native-tinykit.features` when using an explicit feature list.
+
+```tsx
+import { uuid } from 'react-native-tinykit';
+
+const identifier = uuid();
 ```
 
 ## Thermal State

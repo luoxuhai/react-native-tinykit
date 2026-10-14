@@ -21,6 +21,16 @@ features = {
     :definition => "TINYKIT_FEATURE_REVIEW=1",
     :frameworks => ["StoreKit", "UIKit"],
   },
+  "StoreProduct" => {
+    :source_files => "ios/StoreProduct/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_STORE_PRODUCT=1",
+    :frameworks => ["StoreKit", "UIKit"],
+  },
+  "StoreOverlay" => {
+    :source_files => "ios/StoreOverlay/**/*.{h,m,mm,swift,cpp}",
+    :definition => "TINYKIT_FEATURE_STORE_OVERLAY=1",
+    :frameworks => ["StoreKit", "UIKit"],
+  },
   "KeepAwake" => {
     :source_files => "ios/KeepAwake/**/*.{h,m,mm,swift,cpp}",
     :definition => "TINYKIT_FEATURE_KEEP_AWAKE=1",

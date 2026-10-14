@@ -23,6 +23,18 @@ export {
 } from './Mail';
 export { restart } from './Restart';
 export { requestReview } from './Review';
+export {
+  StoreProduct,
+  showStoreProduct,
+  dismissStoreProduct,
+  type StoreProductOptions,
+} from './StoreProduct';
+export {
+  StoreOverlay,
+  showStoreOverlay,
+  dismissStoreOverlay,
+  type StoreOverlayOptions,
+} from './StoreOverlay';
 export { uuid } from './UUID';
 export {
   getThermalState,

@@ -19,6 +19,8 @@ import {
   onThermalStateChange,
   restart,
   requestReview,
+  StoreProduct,
+  StoreOverlay,
   activate,
   deactivate,
   showColorPicker,
@@ -30,6 +32,8 @@ import {
   type ThermalState,
 } from 'react-native-tinykit';
 
+const STORE_APP_ID = '375380948';
+
 export default function App() {
   const [thermalState, setThermalState] = useState<ThermalState>(() =>
     getThermalState()
@@ -40,6 +44,42 @@ export default function App() {
   const [translationStatus, setTranslationStatus] = useState('');
   const [translating, setTranslating] = useState(false);
   const translationSupported = Translation.isSupported();
+  const [storeProductBusy, setStoreProductBusy] = useState(false);
+  const [storeProductStatus, setStoreProductStatus] = useState('');
+  const [storeOverlayBusy, setStoreOverlayBusy] = useState(false);
+  const [storeOverlayStatus, setStoreOverlayStatus] = useState('');
+
+  const handlePresentStoreProduct = async () => {
+    setStoreProductBusy(true);
+    setStoreProductStatus('Loading App Store page...');
+    try {
+      await StoreProduct.present({ appId: STORE_APP_ID });
+      setStoreProductStatus('App Store page closed');
+    } catch (error) {
+      setStoreProductStatus(
+        error instanceof Error ? error.message : String(error)
+      );
+    } finally {
+      setStoreProductBusy(false);
+    }
+  };
+
+  const handlePresentStoreOverlay = async (
+    position: 'bottom' | 'bottomRaised'
+  ) => {
+    setStoreOverlayBusy(true);
+    setStoreOverlayStatus('Presenting App Store overlay...');
+    try {
+      await StoreOverlay.present({ appId: STORE_APP_ID, position });
+      setStoreOverlayStatus('App Store overlay presented');
+    } catch (error) {
+      setStoreOverlayStatus(
+        error instanceof Error ? error.message : String(error)
+      );
+    } finally {
+      setStoreOverlayBusy(false);
+    }
+  };
 
   const handleTranslate = async () => {
     setTranslating(true);
@@ -201,6 +241,86 @@ export default function App() {
             >
               <Text style={styles.buttonText}>Request Review</Text>
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>App Store Product Page</Text>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={storeProductBusy}
+              onPress={handlePresentStoreProduct}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Show App Store Page</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                StoreProduct.dismiss().catch((error) => {
+                  setStoreProductStatus(
+                    error instanceof Error ? error.message : String(error)
+                  );
+                });
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>
+                Dismiss Page / Cancel Loading
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.hint}>
+              Loads the Apple Store app page. The Promise resolves when it
+              closes.
+            </Text>
+            {storeProductStatus ? (
+              <Text style={styles.description}>{storeProductStatus}</Text>
+            ) : null}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>App Store Overlay</Text>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={storeOverlayBusy}
+              onPress={() => {
+                handlePresentStoreOverlay('bottom');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Show Bottom Overlay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={storeOverlayBusy}
+              onPress={() => {
+                handlePresentStoreOverlay('bottomRaised');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Show Raised Overlay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                StoreOverlay.dismiss()
+                  .then(() => setStoreOverlayStatus('Dismissal requested'))
+                  .catch((error) => {
+                    setStoreOverlayStatus(
+                      error instanceof Error ? error.message : String(error)
+                    );
+                  });
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Dismiss Store Overlay</Text>
+            </TouchableOpacity>
+            <Text style={styles.hint}>
+              Requires a physical device. The Promise resolves after
+              presentation.
+            </Text>
+            {storeOverlayStatus ? (
+              <Text style={styles.description}>{storeOverlayStatus}</Text>
+            ) : null}
           </View>
 
           <View style={styles.section}>

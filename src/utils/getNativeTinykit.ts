@@ -6,6 +6,8 @@ export type TinykitFeature =
   | 'Restart'
   | 'ThermalState'
   | 'Review'
+  | 'StoreProduct'
+  | 'StoreOverlay'
   | 'KeepAwake'
   | 'ColorPicker'
   | 'Haptics'

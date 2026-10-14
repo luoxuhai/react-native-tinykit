@@ -17,6 +17,8 @@ interactions to TypeScript, with native features you can include individually.
 | [UUID](#uuid)                  | Generate random UUID version 4 strings                        |
 | [ThermalState](#thermal-state) | Read and monitor the device's thermal state                   |
 | [Review](#app-review)          | Request an App Store review                                   |
+| [StoreProduct](#store-product) | Present an App Store product page inside your app             |
+| [StoreOverlay](#store-overlay) | Present Apple's compact app promotion overlay                 |
 | [KeepAwake](#keep-awake)       | Prevent automatic screen locking                              |
 | [Haptics](#haptics)            | Trigger impact, selection, and notification feedback          |
 | [ColorPicker](#color-picker)   | Present the native iOS color picker                           |
@@ -112,6 +114,9 @@ end
 The helper reads the same feature list and installs only the selected overlay
 Pods. Omit it when all three overlay features are excluded, as in the
 `Haptics` / `KeepAwake` configuration above.
+
+`StoreProduct` and `StoreOverlay` use Apple's StoreKit framework and do not
+require the overlay Podfile helper or any additional Pods.
 
 ```sh
 cd ios && pod install
@@ -234,6 +239,104 @@ The Promise resolves after the request is submitted, without reporting whether
 a prompt appeared or a review was submitted. The system controls presentation;
 follow Apple's [review request guidance](https://developer.apple.com/documentation/storekit/requesting-app-store-reviews)
 when choosing when to call it.
+
+## Store Product
+
+`StoreProduct.present(options): Promise<void>` loads a product and presents
+Apple's `SKStoreProductViewController` inside your app:
+
+```tsx
+import { StoreProduct } from 'react-native-tinykit';
+
+await StoreProduct.present({ appId: '375380948' });
+console.log('App Store page closed');
+
+// From another action, close the page or cancel a pending load.
+await StoreProduct.dismiss();
+```
+
+The page is presented after StoreKit finishes loading. `present` resolves when
+the user closes the page or `dismiss` closes it, including when loading is
+cancelled before presentation. It does not report whether the user installed
+the app. `dismiss(): Promise<void>` resolves after the page is removed, or after
+the pending load is cancelled; it is safe when no page is open.
+
+| Option           | Type     | Description                                                  |
+| ---------------- | -------- | ------------------------------------------------------------ |
+| `appId`          | `string` | Required positive numeric App Store ID, without `id` prefix. |
+| `affiliateToken` | `string` | Optional affiliate attribution token.                        |
+| `campaignToken`  | `string` | Optional campaign attribution token.                         |
+| `providerToken`  | `string` | Optional provider attribution token.                         |
+
+The equivalent named exports are `showStoreProduct`, `dismissStoreProduct`,
+and `StoreProductOptions`. They are also available from
+`react-native-tinykit/store-product`. If your app configures native features,
+add `StoreProduct` to `react-native-tinykit.features`, then run `pod install`
+and rebuild.
+
+App IDs must contain only ASCII decimal digits and have a value greater than
+zero within the unsigned 64-bit range; URLs, numbers, and `id375380948` are
+rejected. Provided tokens must be non-empty strings. Invalid options reject
+with `E_STORE_PRODUCT_INVALID_OPTIONS`.
+Another request while a page is loading, presented, or closing rejects with
+`E_STORE_PRODUCT_ALREADY_PRESENTED`. A missing presenter rejects with
+`E_STORE_PRODUCT_NO_PRESENTER`; StoreKit load failures reject with
+`E_STORE_PRODUCT_LOAD_FAILED`. Module invalidation rejects a pending call with
+`E_STORE_PRODUCT_CANCELLED`. Use a physical device for final product-page
+validation.
+
+## Store Overlay
+
+`StoreOverlay.present(options): Promise<void>` presents Apple's `SKOverlay`
+to promote an App Store app in the current window scene:
+
+```tsx
+import { StoreOverlay } from 'react-native-tinykit';
+
+await StoreOverlay.present({
+  appId: '375380948',
+  position: 'bottomRaised',
+  userDismissible: true,
+});
+console.log('App Store overlay presented');
+
+// From a later action, request dismissal.
+await StoreOverlay.dismiss();
+```
+
+`present` resolves after StoreKit reports successful presentation. It does not
+wait for dismissal or report an installation. `dismiss(): Promise<void>`
+resolves when the dismissal request is recorded; the system's dismissal
+animation may still be running. While loading or presenting, TinyKit waits for
+StoreKit to finish presentation and then dismisses the overlay. Dismissing
+before presentation completes
+rejects the pending `present` call with `E_STORE_OVERLAY_CANCELLED`. Dismissal
+is safe when no TinyKit store overlay is open.
+
+| Option            | Type                         | Description                                                    |
+| ----------------- | ---------------------------- | -------------------------------------------------------------- |
+| `appId`           | `string`                     | Required positive numeric App Store ID, without `id` prefix.   |
+| `position`        | `'bottom' \| 'bottomRaised'` | Placement relative to the bottom edge. Defaults to `'bottom'`. |
+| `userDismissible` | `boolean`                    | Whether the user can dismiss the overlay. Defaults to `true`.  |
+| `campaignToken`   | `string`                     | Optional non-empty campaign attribution token.                 |
+| `providerToken`   | `string`                     | Optional non-empty provider attribution token.                 |
+
+The equivalent named exports are `showStoreOverlay`, `dismissStoreOverlay`,
+and `StoreOverlayOptions`. They are also available from
+`react-native-tinykit/store-overlay`. If your app configures native features,
+add `StoreOverlay` to `react-native-tinykit.features`, then run `pod install`
+and rebuild.
+
+This feature requires a physical iPhone or iPad; StoreKit does not support
+[`SKOverlay` in the simulator](<https://developer.apple.com/documentation/storekit/skoverlaydelegate/storeoverlaydidfailtoload(_:error:)>).
+Invalid app IDs, token strings, positions, or boolean options reject with
+`E_STORE_OVERLAY_INVALID_OPTIONS`. Another request
+while an overlay is active or dismissing rejects with
+`E_STORE_OVERLAY_ALREADY_PRESENTED`. An unavailable foreground window scene
+rejects with `E_STORE_OVERLAY_NO_WINDOW_SCENE`; unsupported environments reject
+with `E_STORE_OVERLAY_UNAVAILABLE`. StoreKit presentation failures reject with
+`E_STORE_OVERLAY_LOAD_FAILED`. Module invalidation also rejects a pending
+presentation with `E_STORE_OVERLAY_CANCELLED`.
 
 ## Keep Awake
 
@@ -595,8 +698,9 @@ Public option types are available as `ToastOptions`, `AlertOptions`,
 
 ## Example App
 
-The [example app](example/src/App.tsx) demonstrates native utilities, overlays,
-and Translation. From the repository root:
+The [example app](example/src/App.tsx) demonstrates native utilities, status
+overlays, StoreKit product pages and app overlays, and Translation. From the
+repository root:
 
 ```sh
 yarn
@@ -618,7 +722,7 @@ yarn example start
 yarn example ios
 ```
 
-Use a physical device to exercise Translation. See the
+Use a physical device to exercise StoreOverlay and Translation. See the
 [development workflow](CONTRIBUTING.md#development-workflow) for build and
 validation commands.
 

@@ -6,10 +6,14 @@
 #import <MessageUI/MessageUI.h>
 #endif
 
+#if TINYKIT_FEATURE_STORE_PRODUCT || TINYKIT_FEATURE_STORE_OVERLAY
+#import <StoreKit/StoreKit.h>
+#endif
+
 #if TINYKIT_FEATURE_RESTART || TINYKIT_FEATURE_THERMAL_STATE || TINYKIT_FEATURE_REVIEW || \
   TINYKIT_FEATURE_KEEP_AWAKE || TINYKIT_FEATURE_COLOR_PICKER || TINYKIT_FEATURE_HAPTICS || \
   TINYKIT_FEATURE_MAIL || TINYKIT_FEATURE_TOAST || TINYKIT_FEATURE_ALERT || TINYKIT_FEATURE_CONFETTI || \
-  TINYKIT_FEATURE_TRANSLATION
+  TINYKIT_FEATURE_TRANSLATION || TINYKIT_FEATURE_STORE_PRODUCT || TINYKIT_FEATURE_STORE_OVERLAY
 #if __has_include(<react_native_tinykit/react_native_tinykit-Swift.h>)
 #import <react_native_tinykit/react_native_tinykit-Swift.h>
 #else
@@ -28,6 +32,15 @@ static void TinykitLogMissingFeature(NSString *feature)
 }
 
 @implementation Tinykit {
+#if TINYKIT_FEATURE_STORE_PRODUCT || TINYKIT_FEATURE_STORE_OVERLAY
+  BOOL _storeKitInvalidated;
+#endif
+#if TINYKIT_FEATURE_STORE_PRODUCT
+  TinykitStoreProduct *_storeProduct;
+#endif
+#if TINYKIT_FEATURE_STORE_OVERLAY
+  TinykitStoreOverlay *_storeOverlay;
+#endif
 #if TINYKIT_FEATURE_THERMAL_STATE
   TinykitThermalState *_thermalState;
 #endif
@@ -66,6 +79,12 @@ static void TinykitLogMissingFeature(NSString *feature)
 #endif
 #if TINYKIT_FEATURE_REVIEW
   [features addObject:@"Review"];
+#endif
+#if TINYKIT_FEATURE_STORE_PRODUCT
+  [features addObject:@"StoreProduct"];
+#endif
+#if TINYKIT_FEATURE_STORE_OVERLAY
+  [features addObject:@"StoreOverlay"];
 #endif
 #if TINYKIT_FEATURE_KEEP_AWAKE
   [features addObject:@"KeepAwake"];
@@ -155,6 +174,82 @@ static void TinykitLogMissingFeature(NSString *feature)
     @"TinyKit Review is not installed. Add 'Review' to the 'react-native-tinykit.features' array in package.json and run pod install.",
     nil
   );
+#endif
+}
+
+- (void)showStoreProduct:(JS::NativeTinykit::StoreProductOptions &)options
+                 resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_STORE_PRODUCT
+  NSMutableDictionary *storeOptions = [@{@"appId": options.appId()} mutableCopy];
+  NSString *affiliateToken = options.affiliateToken();
+  if (affiliateToken != nil) { storeOptions[@"affiliateToken"] = affiliateToken; }
+  NSString *campaignToken = options.campaignToken();
+  if (campaignToken != nil) { storeOptions[@"campaignToken"] = campaignToken; }
+  NSString *providerToken = options.providerToken();
+  if (providerToken != nil) { storeOptions[@"providerToken"] = providerToken; }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_storeKitInvalidated) {
+      reject(@"E_STORE_PRODUCT_CANCELLED", @"The StoreProduct module was invalidated.", nil);
+      return;
+    }
+    if (self->_storeProduct == nil) { self->_storeProduct = [TinykitStoreProduct new]; }
+    [self->_storeProduct show:storeOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit StoreProduct is not installed. Add 'StoreProduct' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)dismissStoreProduct:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_STORE_PRODUCT
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_storeProduct == nil) { resolve(nil); }
+    else { [self->_storeProduct dismiss:resolve]; }
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit StoreProduct is not installed. Add 'StoreProduct' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)showStoreOverlay:(JS::NativeTinykit::StoreOverlayOptions &)options
+                 resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_STORE_OVERLAY
+  NSMutableDictionary *storeOptions = [@{
+    @"appId": options.appId(),
+    @"position": options.position() ?: @"bottom",
+    @"userDismissible": @(options.userDismissible().value_or(true)),
+  } mutableCopy];
+  NSString *campaignToken = options.campaignToken();
+  if (campaignToken != nil) { storeOptions[@"campaignToken"] = campaignToken; }
+  NSString *providerToken = options.providerToken();
+  if (providerToken != nil) { storeOptions[@"providerToken"] = providerToken; }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_storeKitInvalidated) {
+      reject(@"E_STORE_OVERLAY_CANCELLED", @"The StoreOverlay module was invalidated.", nil);
+      return;
+    }
+    if (self->_storeOverlay == nil) { self->_storeOverlay = [TinykitStoreOverlay new]; }
+    [self->_storeOverlay show:storeOptions resolve:resolve rejecter:reject];
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit StoreOverlay is not installed. Add 'StoreOverlay' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
+#endif
+}
+
+- (void)dismissStoreOverlay:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
+{
+#if TINYKIT_FEATURE_STORE_OVERLAY
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_storeOverlay == nil) { resolve(nil); }
+    else { [self->_storeOverlay dismiss:resolve]; }
+  });
+#else
+  reject(@"E_FEATURE_NOT_INSTALLED", @"TinyKit StoreOverlay is not installed. Add 'StoreOverlay' to the 'react-native-tinykit.features' array in package.json and run pod install.", nil);
 #endif
 }
 
@@ -574,6 +669,17 @@ static void TinykitLogMissingFeature(NSString *feature)
 - (void)invalidate
 {
   dispatch_async(dispatch_get_main_queue(), ^{
+#if TINYKIT_FEATURE_STORE_PRODUCT || TINYKIT_FEATURE_STORE_OVERLAY
+    self->_storeKitInvalidated = YES;
+#endif
+#if TINYKIT_FEATURE_STORE_PRODUCT
+    [self->_storeProduct invalidate];
+    self->_storeProduct = nil;
+#endif
+#if TINYKIT_FEATURE_STORE_OVERLAY
+    [self->_storeOverlay invalidate];
+    self->_storeOverlay = nil;
+#endif
 #if TINYKIT_FEATURE_TOAST
     [self->_toast invalidate];
     self->_toast = nil;

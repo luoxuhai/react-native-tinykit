@@ -99,4 +99,27 @@ class OverlayPodsTest < Minitest::Test
       end
     end
   end
+
+  def test_storekit_features_select_only_their_sources_and_system_frameworks
+    storekit_features = {
+      "StoreProduct" => "TINYKIT_FEATURE_STORE_PRODUCT=1",
+      "StoreOverlay" => "TINYKIT_FEATURE_STORE_OVERLAY=1",
+    }
+    [[], ["StoreProduct"], ["StoreOverlay"], storekit_features.keys].each do |features|
+      config = { "react-native-tinykit" => { "features" => features } }
+      check_selection(config, [])
+      with_config(config) do
+        spec = Pod::Specification.from_file(File.expand_path("../react-native-tinykit.podspec", __dir__))
+        attributes = spec.attributes_hash
+        expected_sources = ["ios/Core/**/*.{h,m,mm,swift,cpp}"] + features.map { |feature| "ios/#{feature}/**/*.{h,m,mm,swift,cpp}" }
+        assert_equal expected_sources.sort, attributes.fetch("source_files").sort
+        expected_frameworks = features.empty? ? [] : ["StoreKit", "UIKit"]
+        assert_equal expected_frameworks.sort, attributes.fetch("frameworks", []).sort
+        assert_empty attributes.fetch("weak_frameworks", [])
+        definitions = attributes.fetch("pod_target_xcconfig").fetch("GCC_PREPROCESSOR_DEFINITIONS").split
+        assert_equal ["$(inherited)"] + features.map { |feature| storekit_features.fetch(feature) }, definitions
+        assert_empty spec.dependencies
+      end
+    end
+  end
 end

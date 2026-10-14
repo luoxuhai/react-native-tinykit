@@ -80,6 +80,25 @@ export type ConfettiOptions = {
   duration?: CodegenTypes.Double;
 };
 
+export type StoreProductOptions = {
+  /** Positive numeric App Store app ID, without the "id" prefix. */
+  appId: string;
+  affiliateToken?: string;
+  campaignToken?: string;
+  providerToken?: string;
+};
+
+export type StoreOverlayOptions = {
+  /** Positive numeric App Store app ID, without the "id" prefix. */
+  appId: string;
+  /** Overlay placement. Defaults to bottom. */
+  position?: 'bottom' | 'bottomRaised';
+  /** Whether the user can dismiss the overlay. Defaults to true. */
+  userDismissible?: boolean;
+  campaignToken?: string;
+  providerToken?: string;
+};
+
 export type TranslationAnchor = {
   /** Rectangle in window coordinates, in points. */
   x: CodegenTypes.Double;
@@ -187,6 +206,10 @@ export interface Spec extends TurboModule {
   startThermalStateMonitoring(): void;
   stopThermalStateMonitoring(): void;
   requestReview(): Promise<void>;
+  showStoreProduct(options: StoreProductOptions): Promise<void>;
+  dismissStoreProduct(): Promise<void>;
+  showStoreOverlay(options: StoreOverlayOptions): Promise<void>;
+  dismissStoreOverlay(): Promise<void>;
   activateKeepAwake(): void;
   deactivateKeepAwake(): void;
   showColorPicker(options: ColorPickerOptions): Promise<ColorPickerResult>;

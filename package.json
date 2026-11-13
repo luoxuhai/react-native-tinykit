@@ -1,6 +1,6 @@
 {
   "name": "react-native-tinykit",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "A lightweight React Native toolkit for iOS with native utilities and optional SPIndicator, SPAlert and SPConfetti overlays",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
